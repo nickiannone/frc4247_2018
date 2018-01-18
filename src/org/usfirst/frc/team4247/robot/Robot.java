@@ -31,7 +31,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		// Magical AI bullcrap
+		// Magical AI stuff
 	}
 	
 	@Override
