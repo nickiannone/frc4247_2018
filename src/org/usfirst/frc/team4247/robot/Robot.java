@@ -10,13 +10,23 @@ import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Robot extends IterativeRobot {
 	
-	// TODO Robot controls
-	private Timer timer = new Timer();
+	// TODO Robot controls - keep public!
+	public Timer timer = new Timer();
 	//...
+	
+	public MecanumDrive drive;
+	public Joystick joystick = new Joystick(0);
+	
+	
 	
 	// Vision values
 	private VisionProcessor vision;
@@ -33,6 +43,20 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		// Set up the controls
+		
+		// Drive system
+		WPI_TalonSRX frontLeft = new WPI_TalonSRX(1);
+		WPI_TalonSRX frontRight = new WPI_TalonSRX(2);
+		WPI_TalonSRX backLeft = new WPI_TalonSRX(3);
+		WPI_TalonSRX backRight = new WPI_TalonSRX(4);
+		// TODO Invert any of the Talons here!
+		this.drive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
+		
+		// Pneumatics
+		
+		// Sensors
+		
+		// Camera
 		
 		// Set up vision processing
 		this.vision = new VisionProcessor();
@@ -113,11 +137,25 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopInit() {
-		// Go go go!
+		// Let the user take control; reset stuff operating during Auto to sane values.
+		this.drive.stopMotor();
 	}
 	
 	@Override
 	public void teleopPeriodic() {
-		// Drive and stuff
+		// Get joystick input
+		double x = this.joystick.getX(Hand.kLeft);
+		double y = this.joystick.getY(Hand.kLeft);
+		double z = this.joystick.getX(Hand.kRight);
+		
+		// Drive
+		this.drive.driveCartesian(y, x, z);
+		
+		// Operate lift
+		
+		// Operate claws
+		
+		// 
+		
 	}
 }

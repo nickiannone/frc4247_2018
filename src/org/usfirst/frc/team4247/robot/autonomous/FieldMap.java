@@ -43,6 +43,20 @@ public class FieldMap {
 		public int xMax;
 		public int yMin;
 		public int yMax;
+		
+		public Position getCentroid() {
+			return new Position((double)xMax - (double)xMin, (double)yMax - (double)yMin);
+		}
+	}
+	
+	public class Position {
+		public Position(double x, double y) {
+			this.x = x;
+			this.y = y;
+		}
+		
+		public double x;
+		public double y;
 	}
 	
 	/**
@@ -137,6 +151,19 @@ public class FieldMap {
 		public int y;
 	}
 	
+	public enum StartPosition {
+		// TODO Add these in from the bitmap!
+		LEFT(new Region()),
+		CENTER(new Region()),
+		RIGHT(new Region());
+		
+		StartPosition(Region region) {
+			this.region = region;
+		}
+		
+		public Region region;
+	}
+	
 	public class Cube {
 		public Cube(Region region, Stack stack, Approach approach, float height) {
 			this.region = region;
@@ -167,8 +194,14 @@ public class FieldMap {
 	private List<Target> targets = new ArrayList<>();
 	private List<Cube> cubes = new ArrayList<>();
 	private List<Obstacle> obstacles = new ArrayList<>();
+	private Region robotPosition = null;
+	private StartPosition startPosition = null;
 	
-	public FieldMap(String gsc) {
+	public FieldMap(String gsc, StartPosition start) {
+		// Set the robot's starting position
+		this.startPosition = start;
+		this.robotPosition = start.region;
+		
 		// Parse the game-specific code
 		boolean leftNearSwitch = gsc.charAt(0) == 'L';
 		boolean leftScale = gsc.charAt(1) == 'L';
@@ -238,6 +271,35 @@ public class FieldMap {
 		
 		// TODO Add obstacles
 	}
+
+	public Position getCurrentPosition() {
+		return robotPosition.getCentroid();
+	}
 	
+	public StartPosition getStartPosition() {
+		return startPosition;
+	}
 	
+	public Target findNearestAlliedTarget() {
+		Position p = this.getCurrentPosition();
+		Target nearest = null;
+		double distance = 1000.0;
+		for (Target t : this.targets) {
+			if (t.alliance == Alliance.OURS) {
+				double newDistance = this.calcDistSquared(p, t.region.getCentroid());
+				if (nearest == null || newDistance < distance) {
+					distance = newDistance;
+					nearest = t;
+				}
+			}
+		}
+		return nearest;
+	}
+	
+	// Fast distance approximation between two points.
+	public double calcDistSquared(Position a, Position b) {
+		double xDiff = b.x - a.x;
+		double yDiff = b.y - a.y;
+		return (xDiff * xDiff) + (yDiff * yDiff);
+	}
 }
