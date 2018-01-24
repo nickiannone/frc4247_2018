@@ -15,9 +15,12 @@ public class Driver {
 	
 	private Task[] currentTasks;
 	private VisionResult visionResult;
+	
+	private Robot robot;
 
 	public Driver(Robot robot) {
 		// TODO Auto-generated constructor stub
+		this.robot = robot;
 	}
 
 	public void setTasks(Task[] tasks) {
@@ -28,6 +31,9 @@ public class Driver {
 		// Called at the start of a frame of autonomous.
 		// Generates a state object encapsulating anything needed for this frame.
 
+		// 
+		
+		
 		// TODO Finish this!
 		return null;
 	}
