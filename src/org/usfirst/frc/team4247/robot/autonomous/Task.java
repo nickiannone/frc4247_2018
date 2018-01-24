@@ -10,9 +10,16 @@ package org.usfirst.frc.team4247.robot.autonomous;
  *  <li>Manipulator Commands (Grab, Release)</li>
  * </ul>
  * 
+ * The value parameter of the Task indicates distance, angle, or
+ * height values to be used for task execution.
+ * 
  * @author NickIannone
  */
 public class Task {
+
+	public Task(TaskType rotate, double value) {
+		// TODO Auto-generated constructor stub
+	}
 
 	public enum TaskType {
 		DRIVE,

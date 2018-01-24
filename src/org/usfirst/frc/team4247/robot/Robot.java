@@ -1,11 +1,14 @@
 package org.usfirst.frc.team4247.robot;
 
+import java.util.List;
+
 import org.usfirst.frc.team4247.robot.autonomous.AutoState;
 import org.usfirst.frc.team4247.robot.autonomous.Driver;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap;
 import org.usfirst.frc.team4247.robot.autonomous.Navigator;
 import org.usfirst.frc.team4247.robot.autonomous.State;
 import org.usfirst.frc.team4247.robot.autonomous.Task;
+import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
 import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -89,7 +92,11 @@ public class Robot extends IterativeRobot {
 		
 		// Get the GSC from the field, and reinitialize the FieldMap
 		String gsc = DriverStation.getInstance().getGameSpecificMessage();
-		this.fieldMap = new FieldMap(gsc);
+		
+		// TODO Use a switch, analog input, or NetworkTables or something to figure out what side we're on!
+		StartPosition position = StartPosition.LEFT;
+		
+		this.fieldMap = new FieldMap(gsc, position);
 		
 		// Set up the Navigator and the Driver
 		this.navigator = new Navigator(this);
@@ -100,7 +107,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		this.frameCounter++;
 		if (this.enteringState) {
-			Task[] tasks = this.navigator.generateInitialTasks(this.state);
+			List<Task> tasks = this.navigator.generateInitialTasks(this.state);
 			this.driver.setTasks(tasks);
 		} else {
 			// Get the position updates from the driver
@@ -111,7 +118,7 @@ public class Robot extends IterativeRobot {
 			
 			// If we need to find a new plan
 			if (as.needsReevaluation) {
-				Task[] tasks = this.navigator.reevaluateTasks(this.state, as);
+				List<Task> tasks = this.navigator.reevaluateTasks(this.state, as);
 				this.driver.setTasks(tasks);
 				return;
 			}

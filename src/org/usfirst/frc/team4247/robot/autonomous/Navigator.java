@@ -1,8 +1,12 @@
 package org.usfirst.frc.team4247.robot.autonomous;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.usfirst.frc.team4247.robot.Robot;
-import org.usfirst.frc.team4247.robot.autonomous.FieldMap.Position;
-import org.usfirst.frc.team4247.robot.autonomous.FieldMap.Region;
+import org.usfirst.frc.team4247.robot.autonomous.FieldMap.Approach;
+import org.usfirst.frc.team4247.robot.autonomous.FieldMap.Cube;
+import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
 import org.usfirst.frc.team4247.robot.autonomous.Task.TaskType;
 
 /**
@@ -23,37 +27,33 @@ public class Navigator {
 		this.robot = robot;
 	}
 
-	public Task[] generateInitialTasks(State state) {
+	public List<Task> generateInitialTasks(State state) {
 		Position pos = robot.fieldMap.getCurrentPosition();
 		switch (state) {
 		case START:
 			// No tasks
-			return new Task[] {};
+			return new LinkedList<Task>();
 		case BASE_LINE:
-			Region targetRegion;
-			switch (robot.fieldMap.getStartPosition()) {
-			case LEFT:
-				// TODO Fill these in based on bitmap!
-				targetRegion = new Region();
-				break;
-			case CENTER:
-				targetRegion = new Region();
-				break;
-			case RIGHT:
-				targetRegion = new Region();
-				break;
-			}
+			Region targetRegion = (robot.fieldMap.getStartPosition() == StartPosition.LEFT)
+				? new Region(4, 20, 9, 25) 
+				: new Region(41, 20, 46, 25);
 			
 			return this.generatePathBetween(robot.fieldMap.getStartPosition().region.getCentroid(), targetRegion);
-			break;
 		case SCORE_CUBE:
 			// TODO Score a cube
-			break;
+			Target t = robot.fieldMap.findNearestAlliedTarget();
+			Region targetRegion = t.findClosestApproachPositionTo(robot.fieldMap.getCurrentPosition());
+			double angle = targetRegion.getApproachAngle(t.region);
+			List<Task> scoreCubeTasks = this.generatePathBetween(robot.fieldMap.getCurrentPosition(), targetRegion);
+			scoreCubeTasks.add(new Task(TaskType.ROTATE, angle));
+			scoreCubeTasks.add(new Task(TaskType.RELEASE, t.height));
+			return scoreCubeTasks;
 		case FIND_CUBE:
-			// TODO Find a cube
-			
-			
-			break;
+			Cube nearestCube = robot.fieldMap.findNearestCube();
+			List<Task> findCubeTasks = this.generatePathBetween(robot.fieldMap.getCurrentPosition(), nearestCube.getApproachRegion());
+			findCubeTasks.add(new Task(TaskType.ROTATE, nearestCube.approach.angle));
+			findCubeTasks.add(new Task(TaskType.GRAB, nearestCube.height));
+			return findCubeTasks;
 		case IDLE:
 		default:
 			// Find a random point on the map
@@ -66,9 +66,9 @@ public class Navigator {
 			} while (this.checkCollision(x, y));
 			
 			// Plot a path to that region
-			Region r = new Region((int)x, (int)y, ((int)x)+1, ((int)y)+1);
+			Region randomRegion = new Region((int)x, (int)y, ((int)x)+1, ((int)y)+1);
 			
-			return this.generatePathBetween(robot.fieldMap.getCurrentPosition(), r);
+			return this.generatePathBetween(robot.fieldMap.getCurrentPosition(), randomRegion);
 		}
 	}
 
@@ -80,17 +80,19 @@ public class Navigator {
 		// etc.
 	}
 
-	public Task[] reevaluateTasks(State state, AutoState as) {
-		// TODO Recalculate based on current state.
-		return null;
+	public List<Task> reevaluateTasks(State state, AutoState as) {
+		// TODO Make sure we don't need anything more than the initial tasks here!
+		return this.generateInitialTasks(state);
 	}
 	
-	private Task[] generatePathBetween(Position p, Region r) {
-		// TODO Implement pathfinding algorithm
+	private List<Task> generatePathBetween(Position p, Region r) {
+		// TODO Implement pathfinding algorithm!!!
+		return new LinkedList<Task>();
 	}
 	
 	private boolean checkCollision(double x, double y) {
 		// TODO A simple collision check against all Obstacles and TemporaryObstacles.
+		return false;
 	}
 
 }

@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4247.robot.autonomous;
 
+import java.util.List;
+
 import org.usfirst.frc.team4247.robot.Robot;
 import org.usfirst.frc.team4247.robot.vision.VisionResult;
 
@@ -13,7 +15,7 @@ import org.usfirst.frc.team4247.robot.vision.VisionResult;
  */
 public class Driver {
 	
-	private Task[] currentTasks;
+	private List<Task> currentTasks;
 	private VisionResult visionResult;
 	
 	private Robot robot;
@@ -23,7 +25,7 @@ public class Driver {
 		this.robot = robot;
 	}
 
-	public void setTasks(Task[] tasks) {
+	public void setTasks(List<Task> tasks) {
 		this.currentTasks = tasks;
 	}
 

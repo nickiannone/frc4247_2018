@@ -22,3 +22,10 @@ As of right now, the design specifics of our robot are a secret (ie. they're not
 - Deposit cubes into the portal
 - Pick up cubes off the ground
 - Hoist the robot at the end of the match
+
+## Installation Notes
+
+In order to compile this software, you will need the following libraries installed:
+
+- WPILib (from http://first.wpi.edu/FRC/roborio/release/eclipse/)
+- CTRE Phoenix Framework Installer 5.2.1.1 (from http://www.ctr-electronics.com/hro.html#product_tabs_technical_resources)

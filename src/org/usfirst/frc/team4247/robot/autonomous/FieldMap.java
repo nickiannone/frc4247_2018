@@ -28,38 +28,6 @@ public class FieldMap {
 	public static final int MAX_Y = 100;
 	
 	/**
-	 * The Region class represents an individual region of the map.
-	 * Regions are defined by units of half-cubes (6.5") of distance.
-	 */
-	public class Region {
-		public Region(int xMin, int yMin, int xMax, int yMax) {
-			this.xMin = xMin;
-			this.yMin = yMin;
-			this.xMax = xMax;
-			this.yMax = yMax;
-		}
-		
-		public int xMin;
-		public int xMax;
-		public int yMin;
-		public int yMax;
-		
-		public Position getCentroid() {
-			return new Position((double)xMax - (double)xMin, (double)yMax - (double)yMin);
-		}
-	}
-	
-	public class Position {
-		public Position(double x, double y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		public double x;
-		public double y;
-	}
-	
-	/**
 	 * The TargetType enum represents the different types of
 	 * targets that we can represent on the map. The base types
 	 * are Positions (which we use to navigate), power cubes,
@@ -95,30 +63,6 @@ public class FieldMap {
 		THEIRS
 	}
 	
-	/**
-	 * The Target class represents a specific scoring region
-	 * within the Arcade field. These could be 
-	 */
-	public class Target {
-		public Target(Region region, Alliance alliance, TargetType type, int height) {
-			this.region = region;
-			this.alliance = alliance;
-			this.type = type;
-			this.height = height;
-		}
-		
-		public Target(Region region, Alliance alliance, TargetType type) {
-			this.region = region;
-			this.alliance = alliance;
-			this.type = type;
-		}
-		
-		public Region region;
-		public Alliance alliance;
-		public TargetType type;
-		public int height = 0; // Inches off the ground
-	}
-	
 	public enum Stack {
 		NEAR,
 		FAR,
@@ -127,7 +71,8 @@ public class FieldMap {
 	
 	/**
 	 * What angle to approach a cube from. When generating a map to the nearest cube,
-	 * these values are added to the cube's starting location.
+	 * these values are added to the cube's starting location. This also includes the
+	 * angle of approach, as degrees clockwise from Y+.
 	 * 
 	 * <ul>
 	 * 	<li>ABOVE - Approach from 2 units more in the Y direction.</li>
@@ -137,25 +82,27 @@ public class FieldMap {
 	 * </ul>
 	 */
 	public enum Approach {
-		ABOVE(0, 2),
-		BELOW(0, -2),
-		LEFT(-2, 0),
-		RIGHT(2, 0);
+		ABOVE(0, 2, 180.0),
+		BELOW(0, -2, 0.0),
+		LEFT(-2, 0, 90.0),
+		RIGHT(2, 0, 270.0);
 		
-		Approach(int x, int y) {
+		Approach(int x, int y, double angle) {
 			this.x = x;
 			this.y = y;
+			this.angle = angle;
 		}
 		
 		public int x;
 		public int y;
+		public double angle;
 	}
 	
 	public enum StartPosition {
 		// TODO Add these in from the bitmap!
-		LEFT(new Region()),
-		CENTER(new Region()),
-		RIGHT(new Region());
+		LEFT(new Region(4, 0, 9, 5)),
+		CENTER(new Region(30, 0, 35, 5)),
+		RIGHT(new Region(41, 0, 46, 5));
 		
 		StartPosition(Region region) {
 			this.region = region;
@@ -176,6 +123,13 @@ public class FieldMap {
 		public Stack stack;
 		public Approach approach;
 		public float height = 0.0f;
+		
+		public Region getApproachRegion() {
+			return new Region(region.xMin + approach.x, 
+					region.yMin + approach.y,
+					region.xMax + approach.x,
+					region.yMax + approach.y);
+		}
 	}
 	
 	/**
@@ -283,7 +237,7 @@ public class FieldMap {
 	public Target findNearestAlliedTarget() {
 		Position p = this.getCurrentPosition();
 		Target nearest = null;
-		double distance = 1000.0;
+		double distance = 100000.0;
 		for (Target t : this.targets) {
 			if (t.alliance == Alliance.OURS) {
 				double newDistance = this.calcDistSquared(p, t.region.getCentroid());
@@ -291,6 +245,20 @@ public class FieldMap {
 					distance = newDistance;
 					nearest = t;
 				}
+			}
+		}
+		return nearest;
+	}
+	
+	public Cube findNearestCube() {
+		Position p = this.getCurrentPosition();
+		Cube nearest = null;
+		double distance = 100000.0;
+		for (Cube c : this.cubes) {
+			double newDistance = this.calcDistSquared(p, c.getApproachRegion().getCentroid());
+			if (nearest == null || newDistance < distance) {
+				nearest = c;
+				distance = newDistance;
 			}
 		}
 		return nearest;
