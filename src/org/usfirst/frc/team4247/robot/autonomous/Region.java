@@ -20,4 +20,9 @@ public class Region {
 	public Position getCentroid() {
 		return new Position((double)xMax - (double)xMin, (double)yMax - (double)yMin);
 	}
+
+	public double getApproachAngle(Region region) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

@@ -25,4 +25,9 @@ public class Target {
 	public Alliance alliance;
 	public TargetType type;
 	public int height = 0; // Inches off the ground
+	
+	public Region findClosestApproachPositionTo(Position currentPosition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

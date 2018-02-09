@@ -52,6 +52,9 @@ public class Robot extends IterativeRobot {
 		WPI_TalonSRX frontRight = new WPI_TalonSRX(2);
 		WPI_TalonSRX backLeft = new WPI_TalonSRX(3);
 		WPI_TalonSRX backRight = new WPI_TalonSRX(4);
+		
+		backLeft.setInverted(true);
+		frontRight.setInverted(true);
 		// TODO Invert any of the Talons here!
 		this.drive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
 		

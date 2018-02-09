@@ -42,9 +42,9 @@ public class Navigator {
 		case SCORE_CUBE:
 			// TODO Score a cube
 			Target t = robot.fieldMap.findNearestAlliedTarget();
-			Region targetRegion = t.findClosestApproachPositionTo(robot.fieldMap.getCurrentPosition());
-			double angle = targetRegion.getApproachAngle(t.region);
-			List<Task> scoreCubeTasks = this.generatePathBetween(robot.fieldMap.getCurrentPosition(), targetRegion);
+			Region scoreTargetRegion = t.findClosestApproachPositionTo(robot.fieldMap.getCurrentPosition());
+			double angle = scoreTargetRegion.getApproachAngle(t.region);
+			List<Task> scoreCubeTasks = this.generatePathBetween(robot.fieldMap.getCurrentPosition(), scoreTargetRegion);
 			scoreCubeTasks.add(new Task(TaskType.ROTATE, angle));
 			scoreCubeTasks.add(new Task(TaskType.RELEASE, t.height));
 			return scoreCubeTasks;
