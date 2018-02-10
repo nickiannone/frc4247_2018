@@ -9,30 +9,37 @@ import org.usfirst.frc.team4247.robot.autonomous.Navigator;
 import org.usfirst.frc.team4247.robot.autonomous.State;
 import org.usfirst.frc.team4247.robot.autonomous.Task;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
+import org.usfirst.frc.team4247.robot.parts.IDrive;
+import org.usfirst.frc.team4247.robot.parts.IJoystick;
+import org.usfirst.frc.team4247.robot.parts.IRobotParts;
+import org.usfirst.frc.team4247.robot.parts.impl.RobotParts;
 import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-public class Robot extends IterativeRobot {
+public class Robot extends IterativeRobot implements IRobot {
 	
-	// TODO Robot controls - keep public!
+	private IRobotParts robotParts;
+	
+	// TODO Wrap these in IRobotParts!
+	// Robot controls - keep public!
 	public Timer timer = new Timer();
 	//...
 	
 	public MecanumDrive drive;
+	public WPI_TalonSRX liftMotor;
 	public Joystick joystick = new Joystick(0);
 	
 	
 	
 	// Vision values
-	private VisionProcessor vision;
+	public VisionProcessor vision;
 	
 	// Autonomous values
 	private State state = State.START;
@@ -43,9 +50,13 @@ public class Robot extends IterativeRobot {
 	public Driver driver;
 	public FieldMap fieldMap;
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#robotInit()
+	 */
 	@Override
 	public void robotInit() {
 		// Set up the controls
+		robotParts = new RobotParts();
 		
 		// Drive system
 		WPI_TalonSRX frontLeft = new WPI_TalonSRX(1);
@@ -58,6 +69,10 @@ public class Robot extends IterativeRobot {
 		// TODO Invert any of the Talons here!
 		this.drive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
 		
+		// Lift system
+		this.liftMotor = new WPI_TalonSRX(5);
+		// TODO Invert if needed!
+		
 		// Pneumatics
 		
 		// Sensors
@@ -65,24 +80,36 @@ public class Robot extends IterativeRobot {
 		// Camera
 		
 		// Set up vision processing
-		this.vision = new VisionProcessor();
+		this.vision = new VisionProcessor(/* camera */);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#robotPeriodic()
+	 */
 	@Override
 	public void robotPeriodic() {
 		// Compressor?
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#disabledInit()
+	 */
 	@Override
 	public void disabledInit() {
 		// Disable the bot
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#disabledPeriodic()
+	 */
 	@Override
 	public void disabledPeriodic() {
 		// Do something cool with lights and stuff, I dunno
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#autonomousInit()
+	 */
 	@Override
 	public void autonomousInit() {
 		// Move into START state
@@ -106,6 +133,9 @@ public class Robot extends IterativeRobot {
 		this.driver = new Driver(this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#autonomousPeriodic()
+	 */
 	@Override
 	public void autonomousPeriodic() {
 		this.frameCounter++;
@@ -145,27 +175,41 @@ public class Robot extends IterativeRobot {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#teleopInit()
+	 */
 	@Override
 	public void teleopInit() {
 		// Let the user take control; reset stuff operating during Auto to sane values.
 		this.drive.stopMotor();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.usfirst.frc.team4247.robot.IRobot#teleopPeriodic()
+	 */
 	@Override
 	public void teleopPeriodic() {
+		IJoystick joystick = this.robotParts.getJoystick();
+		IDrive drive = this.robotParts.getMecanumDrive();
+		
 		// Get joystick input
-		double x = this.joystick.getX(Hand.kLeft);
-		double y = this.joystick.getY(Hand.kLeft);
-		double z = this.joystick.getX(Hand.kRight);
+		double x = joystick.getRawAxis(IJoystick.Axis.LEFT_X);
+		double y = joystick.getRawAxis(IJoystick.Axis.LEFT_Y);
+		double z = joystick.getRawAxis(IJoystick.Axis.RIGHT_X);
 		
 		// Drive
-		this.drive.driveCartesian(y, x, z);
+		drive.driveCartesian(y, x, z);
 		
 		// Operate lift
 		
-		// Operate claws
+		// Operate pneumatic claws
 		
 		// 
 		
+	}
+
+	@Override
+	public IRobotParts getRobotParts() {
+		return robotParts;
 	}
 }

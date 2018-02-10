@@ -2,7 +2,7 @@ package org.usfirst.frc.team4247.robot.autonomous;
 
 import java.util.List;
 
-import org.usfirst.frc.team4247.robot.Robot;
+import org.usfirst.frc.team4247.robot.IRobot;
 import org.usfirst.frc.team4247.robot.vision.VisionResult;
 
 /**
@@ -18,9 +18,9 @@ public class Driver {
 	private List<Task> currentTasks;
 	private VisionResult visionResult;
 	
-	private Robot robot;
+	private IRobot robot;
 
-	public Driver(Robot robot) {
+	public Driver(IRobot robot) {
 		// TODO Auto-generated constructor stub
 		this.robot = robot;
 	}
