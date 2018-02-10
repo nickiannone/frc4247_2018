@@ -36,6 +36,7 @@ public interface IJoystick {
 		}
 	}
 	
-	double getRawAxis(Axis a);
-	boolean getButton(Button b);
+	public int getPort();
+	public double getRawAxis(Axis a);
+	public boolean getButton(Button b);
 }

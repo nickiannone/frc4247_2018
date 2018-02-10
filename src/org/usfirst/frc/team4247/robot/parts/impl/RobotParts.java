@@ -9,32 +9,59 @@ import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
+import org.usfirst.frc.team4247.robot.parts.ITimer;
 import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
+
 public class RobotParts implements IRobotParts {
-
-	@Override
-	public Driver getDriver() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Navigator getNavigator() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public FieldMap getFieldMap() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	private IJoystick joystick;
+	private ITimer timer;
+	
+	private IMotor liftMotor;
+	private IDrive mecanumDrive;
+	private IPneumatics pneumatics;
+	private ICamera camera;
+	
+	public RobotParts() {
+		// Initialize the core robot parts (called in robotInit())
+		
+		// Joystick
+		this.joystick = new Joystick(0);
+		
+		this.timer = new Timer();
+		
+		
+		WPI_TalonSRX lift = new WPI_TalonSRX(5);
+		// TODO Invert if needed!
+		this.liftMotor = new Motor(lift);
+		
+		// Drive system
+		WPI_TalonSRX frontLeft = new WPI_TalonSRX(1);
+		WPI_TalonSRX frontRight = new WPI_TalonSRX(2);
+		WPI_TalonSRX backLeft = new WPI_TalonSRX(3);
+		WPI_TalonSRX backRight = new WPI_TalonSRX(4);
+		
+		backLeft.setInverted(true);
+		frontRight.setInverted(true);
+		
+		this.mecanumDrive = new Drive(new MecanumDrive(frontLeft, backLeft, frontRight, backRight));
+		
+		// Pneumatics
+		
+		
+		// Sensors
+		
+		// Camera
+		
 	}
 
 	@Override
 	public IDrive getMecanumDrive() {
-		// TODO Auto-generated method stub
-		return null;
+		return mecanumDrive;
 	}
 
 	@Override
@@ -87,14 +114,24 @@ public class RobotParts implements IRobotParts {
 
 	@Override
 	public void setCamera(ICamera camera) {
-		// TODO Auto-generated method stub
-		
+		this.camera = camera;
 	}
 
 	@Override
 	public VisionProcessor getVisionProcessor() {
+		return this.visionProcessor;
+	}
+
+	@Override
+	public ITimer getTimer() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setTimer(ITimer timer) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
