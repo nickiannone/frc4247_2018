@@ -3,11 +3,10 @@ package org.usfirst.frc.team4247.robot.autonomous;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.usfirst.frc.team4247.robot.Robot;
-import org.usfirst.frc.team4247.robot.autonomous.FieldMap.Approach;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap.Cube;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
 import org.usfirst.frc.team4247.robot.autonomous.Task.TaskType;
+import org.usfirst.frc.team4247.robot.parts.IRobotParts;
 
 /**
  * The Navigator class is responsible for taking what is
@@ -20,37 +19,36 @@ import org.usfirst.frc.team4247.robot.autonomous.Task.TaskType;
  */
 public class Navigator {
 	
-	private Robot robot;
+	private FieldMap fieldMap;
 
-	public Navigator(Robot robot) {
-		// TODO Auto-generated constructor stub
-		this.robot = robot;
+	public Navigator(FieldMap fieldMap) {
+		this.fieldMap = fieldMap;
 	}
 
 	public List<Task> generateInitialTasks(State state) {
-		Position pos = robot.fieldMap.getCurrentPosition();
+		Position pos = fieldMap.getCurrentPosition();
 		switch (state) {
 		case START:
 			// No tasks
 			return new LinkedList<Task>();
 		case BASE_LINE:
-			Region targetRegion = (robot.fieldMap.getStartPosition() == StartPosition.LEFT)
+			Region targetRegion = (fieldMap.getStartPosition() == StartPosition.LEFT)
 				? new Region(4, 20, 9, 25) 
 				: new Region(41, 20, 46, 25);
 			
-			return this.generatePathBetween(robot.fieldMap.getStartPosition().region.getCentroid(), targetRegion);
+			return this.generatePathBetween(fieldMap.getStartPosition().region.getCentroid(), targetRegion);
 		case SCORE_CUBE:
 			// TODO Score a cube
-			Target t = robot.fieldMap.findNearestAlliedTarget();
-			Region scoreTargetRegion = t.findClosestApproachPositionTo(robot.fieldMap.getCurrentPosition());
+			Target t = fieldMap.findNearestAlliedTarget();
+			Region scoreTargetRegion = t.findClosestApproachPositionTo(fieldMap.getCurrentPosition());
 			double angle = scoreTargetRegion.getApproachAngle(t.region);
-			List<Task> scoreCubeTasks = this.generatePathBetween(robot.fieldMap.getCurrentPosition(), scoreTargetRegion);
+			List<Task> scoreCubeTasks = this.generatePathBetween(fieldMap.getCurrentPosition(), scoreTargetRegion);
 			scoreCubeTasks.add(new Task(TaskType.ROTATE, angle));
 			scoreCubeTasks.add(new Task(TaskType.RELEASE, t.height));
 			return scoreCubeTasks;
 		case FIND_CUBE:
-			Cube nearestCube = robot.fieldMap.findNearestCube();
-			List<Task> findCubeTasks = this.generatePathBetween(robot.fieldMap.getCurrentPosition(), nearestCube.getApproachRegion());
+			Cube nearestCube = fieldMap.findNearestCube();
+			List<Task> findCubeTasks = this.generatePathBetween(fieldMap.getCurrentPosition(), nearestCube.getApproachRegion());
 			findCubeTasks.add(new Task(TaskType.ROTATE, nearestCube.approach.angle));
 			findCubeTasks.add(new Task(TaskType.GRAB, nearestCube.height));
 			return findCubeTasks;
@@ -68,11 +66,11 @@ public class Navigator {
 			// Plot a path to that region
 			Region randomRegion = new Region((int)x, (int)y, ((int)x)+1, ((int)y)+1);
 			
-			return this.generatePathBetween(robot.fieldMap.getCurrentPosition(), randomRegion);
+			return this.generatePathBetween(fieldMap.getCurrentPosition(), randomRegion);
 		}
 	}
 
-	public void updateFieldMap(FieldMap fieldMap, AutoState as) {
+	public void updateFieldMap(AutoState as) {
 		// TODO Auto-generated method stub
 		// Apply things like robot position,
 		// any temporary obstacles,
@@ -88,6 +86,9 @@ public class Navigator {
 	private List<Task> generatePathBetween(Position p, Region r) {
 		// TODO Implement pathfinding algorithm!!!
 		return new LinkedList<Task>();
+		
+		
+		
 	}
 	
 	private boolean checkCollision(double x, double y) {

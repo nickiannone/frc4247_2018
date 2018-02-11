@@ -6,6 +6,7 @@ import org.usfirst.frc.team4247.robot.parts.IImage;
 import org.usfirst.frc.team4247.robot.parts.TimeoutException;
 
 import edu.wpi.cscore.AxisCamera;
+import edu.wpi.cscore.CvSource;
 import edu.wpi.first.wpilibj.CameraServer;
 
 public class Camera implements ICamera {
@@ -22,12 +23,17 @@ public class Camera implements ICamera {
 	public IImage getImage() throws TimeoutException {
 		Mat image = new Mat(); // TODO Configure this with default frame settings?
 		long frameTime = CameraServer.getInstance().getVideo(axisCamera).grabFrame(image);
-		return new Image(image, frameTime);
+		return new Image("Camera", image, frameTime);
 	}
 
 	@Override
 	public void putImage(IImage image) {
-		// TODO Auto-generated method stub
-		
+		CvSource source = CameraServer.getInstance().putVideo(image.getName(), image.getWidth(), image.getHeight());
+		try {
+			source.putFrame((Mat) image.getCVCoreImage());
+		} catch (ClassCastException ex) {
+			// Just swallow the error
+			return;
+		}
 	}
 }

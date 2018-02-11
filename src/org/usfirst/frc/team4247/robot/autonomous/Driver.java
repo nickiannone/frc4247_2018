@@ -3,6 +3,7 @@ package org.usfirst.frc.team4247.robot.autonomous;
 import java.util.List;
 
 import org.usfirst.frc.team4247.robot.IRobot;
+import org.usfirst.frc.team4247.robot.parts.IRobotParts;
 import org.usfirst.frc.team4247.robot.vision.VisionResult;
 
 /**
@@ -18,11 +19,12 @@ public class Driver {
 	private List<Task> currentTasks;
 	private VisionResult visionResult;
 	
-	private IRobot robot;
+	private IRobotParts robotParts;
+	private FieldMap fieldMap;
 
-	public Driver(IRobot robot) {
-		// TODO Auto-generated constructor stub
-		this.robot = robot;
+	public Driver(IRobotParts robotParts, FieldMap fieldMap) {
+		this.robotParts = robotParts;
+		this.fieldMap = fieldMap;
 	}
 
 	public void setTasks(List<Task> tasks) {

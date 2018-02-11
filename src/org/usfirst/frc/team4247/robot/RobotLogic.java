@@ -11,14 +11,11 @@ import org.usfirst.frc.team4247.robot.autonomous.Task;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
+import org.usfirst.frc.team4247.robot.parts.IMotor;
+import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
-import org.usfirst.frc.team4247.robot.parts.impl.RobotParts;
+import org.usfirst.frc.team4247.robot.parts.ITimer;
 import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
-
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 public class RobotLogic implements IRobotLogic {
 	
@@ -28,6 +25,11 @@ public class RobotLogic implements IRobotLogic {
 	private State state = State.START;
 	private boolean enteringState = true;
 	private int frameCounter;
+
+	private FieldMap fieldMap;
+	private Navigator navigator;
+	private Driver driver;
+	private VisionProcessor vision;
 	
 	public RobotLogic(IRobotParts parts) {
 		this.parts = parts;
@@ -38,10 +40,7 @@ public class RobotLogic implements IRobotLogic {
 	 */
 	@Override
 	public void robotInit() {
-		// Set up the controls
-		robotParts = new RobotParts();
 		
-
 	}
 	
 	/* (non-Javadoc)
@@ -82,7 +81,7 @@ public class RobotLogic implements IRobotLogic {
 		this.frameCounter = 0;
 		
 		// Get the GSC from the field, and reinitialize the FieldMap
-		String gsc = DriverStation.getInstance().getGameSpecificMessage();
+		String gsc = this.parts.getDriverStation().getGameSpecificMessage();
 		
 		// TODO Use a switch, analog input, or NetworkTables or something to figure out what side we're on!
 		StartPosition position = StartPosition.LEFT;
@@ -90,8 +89,8 @@ public class RobotLogic implements IRobotLogic {
 		this.fieldMap = new FieldMap(gsc, position);
 		
 		// Set up the Navigator and the Driver
-		this.navigator = new Navigator(this);
-		this.driver = new Driver(this);
+		this.navigator = new Navigator(this.fieldMap);
+		this.driver = new Driver(this.parts, this.fieldMap);
 	}
 	
 	/* (non-Javadoc)
@@ -108,7 +107,7 @@ public class RobotLogic implements IRobotLogic {
 			AutoState as = this.driver.getAutoState(this.frameCounter);
 			
 			// Let the navigator see the state, and update the field map accordingly
-			this.navigator.updateFieldMap(this.fieldMap, as);
+			this.navigator.updateFieldMap(as);
 			
 			// If we need to find a new plan
 			if (as.needsReevaluation) {
@@ -120,7 +119,9 @@ public class RobotLogic implements IRobotLogic {
 			// If we need to run vision processing
 			if (as.needsVisionProcessing) {
 				// TODO Do vision processing, see if we have a cube!
-				this.driver.setVisionResults(this.vision.processVision(this.robotParts.getCamera()));
+				this.parts.getMecanumDrive().feedWatchdog();
+				this.driver.setVisionResults(this.vision.processVision(this.parts.getCamera()));
+				this.parts.getMecanumDrive().feedWatchdog();
 				return;
 			}
 			
@@ -142,7 +143,15 @@ public class RobotLogic implements IRobotLogic {
 	@Override
 	public void teleopInit() {
 		// Let the user take control; reset stuff operating during Auto to sane values.
-		this.drive.stopMotor();
+		
+		// Stop the drive
+		this.parts.getMecanumDrive().stopDrive();
+		
+		// Enable pneumatics if not already enabled
+		IPneumatics pneumatics = this.parts.getPneumatics();
+		if (!pneumatics.isClosedLoopControlEnabled()) {
+			pneumatics.setClosedLoopControl(true);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -150,22 +159,28 @@ public class RobotLogic implements IRobotLogic {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		IJoystick joystick = this.robotParts.getJoystick();
-		IDrive drive = this.robotParts.getMecanumDrive();
+		IJoystick joystick = this.parts.getJoystick();
+		IDrive drive = this.parts.getMecanumDrive();
+		IMotor liftMotor = this.parts.getLiftMotor();
+		ITimer timer = this.parts.getTimer();
+		IPneumatics pneumatics = this.parts.getPneumatics();
 		
 		// Get joystick input
 		double x = joystick.getRawAxis(IJoystick.Axis.LEFT_X);
 		double y = joystick.getRawAxis(IJoystick.Axis.LEFT_Y);
 		double z = joystick.getRawAxis(IJoystick.Axis.RIGHT_X);
+		boolean lift = joystick.getButton(IJoystick.Button.A);
+		boolean closeClaw = joystick.getButton(IJoystick.Button.B);
+		boolean climb = joystick.getButton(IJoystick.Button.X);
 		
 		// Drive
 		drive.driveCartesian(y, x, z);
 		
-		// Operate lift
+		// Operate lift TODO - Calculate required speed of lift motor based on position of lift!
+		// liftMotor.set(speed);
 		
 		// Operate pneumatic claws
-		
-		// 
+		pneumatics.setSolenoidState(closeClaw);
 		
 	}
 

@@ -1,43 +1,50 @@
 package org.usfirst.frc.team4247.robot.parts.impl;
 
-import org.usfirst.frc.team4247.robot.autonomous.Driver;
-import org.usfirst.frc.team4247.robot.autonomous.FieldMap;
-import org.usfirst.frc.team4247.robot.autonomous.Navigator;
 import org.usfirst.frc.team4247.robot.parts.ICamera;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
+import org.usfirst.frc.team4247.robot.parts.IDriverStation;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
 import org.usfirst.frc.team4247.robot.parts.ITimer;
-import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
+// TODO Move these out into implementation classes!
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 public class RobotParts implements IRobotParts {
 	
+	private IDriverStation driverStation;
 	private IJoystick joystick;
 	private ITimer timer;
 	
 	private IMotor liftMotor;
+	private IMotor climbMotor;
 	private IDrive mecanumDrive;
 	private IPneumatics pneumatics;
 	private ICamera camera;
 	
+	// Initialize the core robot parts (called in robotInit())
 	public RobotParts() {
-		// Initialize the core robot parts (called in robotInit())
+		
+		// Driver Station
+		this.driverStation = new DriverStation();
 		
 		// Joystick
 		this.joystick = new Joystick(0);
 		
+		// Timer
 		this.timer = new Timer();
-		
 		
 		WPI_TalonSRX lift = new WPI_TalonSRX(5);
 		// TODO Invert if needed!
 		this.liftMotor = new Motor(lift);
+		
+		// Climb motor - Do we need another Talon for this?
+		WPI_TalonSRX climb = new WPI_TalonSRX(6);
+		// TODO Invert if needed!
+		this.climbMotor = new Motor(climb);
 		
 		// Drive system
 		WPI_TalonSRX frontLeft = new WPI_TalonSRX(1);
@@ -51,12 +58,17 @@ public class RobotParts implements IRobotParts {
 		this.mecanumDrive = new Drive(new MecanumDrive(frontLeft, backLeft, frontRight, backRight));
 		
 		// Pneumatics
+		this.pneumatics = new Pneumatics(10, 1);
 		
-		
-		// Sensors
+		// TODO - Other Sensors?
 		
 		// Camera
-		
+		this.camera = new Camera();
+	}
+	
+	@Override
+	public IDriverStation getDriverStation() {
+		return driverStation;
 	}
 
 	@Override
@@ -65,73 +77,32 @@ public class RobotParts implements IRobotParts {
 	}
 
 	@Override
-	public void setMecanumDrive(IDrive mecanumDrive) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public IMotor getLiftMotor() {
-		// TODO Auto-generated method stub
-		return null;
+		return liftMotor;
 	}
-
+	
 	@Override
-	public void setLiftMotor(IMotor liftMotor) {
-		// TODO Auto-generated method stub
-		
+	public IMotor getClimbMotor() {
+		return climbMotor;
 	}
 
 	@Override
 	public IPneumatics getPneumatics() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setPneumatics(IPneumatics pneumatics) {
-		// TODO Auto-generated method stub
-		
+		return pneumatics;
 	}
 
 	@Override
 	public IJoystick getJoystick() {
-		// TODO Auto-generated method stub
-		return null;
+		return joystick;
 	}
-
-	@Override
-	public void setJoystick(IJoystick joystick) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public ICamera getCamera() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setCamera(ICamera camera) {
-		this.camera = camera;
-	}
-
-	@Override
-	public VisionProcessor getVisionProcessor() {
-		return this.visionProcessor;
+		return camera;
 	}
 
 	@Override
 	public ITimer getTimer() {
-		// TODO Auto-generated method stub
-		return null;
+		return timer;
 	}
-
-	@Override
-	public void setTimer(ITimer timer) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
