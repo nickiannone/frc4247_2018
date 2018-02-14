@@ -37,6 +37,7 @@ public class RobotParts implements IRobotParts {
 		// Timer
 		this.timer = new Timer();
 		
+		// Lift motor
 		WPI_TalonSRX lift = new WPI_TalonSRX(5);
 		// TODO Invert if needed!
 		this.liftMotor = new Motor(lift);
@@ -55,9 +56,12 @@ public class RobotParts implements IRobotParts {
 		backLeft.setInverted(true);
 		frontRight.setInverted(true);
 		
-		this.mecanumDrive = new Drive(new MecanumDrive(frontLeft, backLeft, frontRight, backRight));
+		MyMecanumDrive drive = new MyMecanumDrive(frontLeft, backLeft, frontRight, backRight);
+		drive.setMaxOutput(0.75);
+		this.mecanumDrive = new Drive(drive);
 		
 		// Pneumatics
+		// TODO Figure out ports!
 		this.pneumatics = new Pneumatics(10, 1);
 		
 		// TODO - Other Sensors?

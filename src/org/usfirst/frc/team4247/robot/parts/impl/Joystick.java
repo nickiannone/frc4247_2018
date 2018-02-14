@@ -25,4 +25,15 @@ public class Joystick implements IJoystick {
 		return this.joystick.getPort();
 	}
 
+	@Override
+	public POV getPOVDirection() {
+		int direction = this.joystick.getPOV();
+		for (POV pov : POV.values()) {
+			if (pov.value == direction) {
+				return pov;
+			}
+		}
+		return POV.CENTER;
+	}
+
 }

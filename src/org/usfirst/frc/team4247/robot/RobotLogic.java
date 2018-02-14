@@ -11,6 +11,7 @@ import org.usfirst.frc.team4247.robot.autonomous.Task;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
+import org.usfirst.frc.team4247.robot.parts.IJoystick.POV;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
@@ -18,6 +19,8 @@ import org.usfirst.frc.team4247.robot.parts.ITimer;
 import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
 public class RobotLogic implements IRobotLogic {
+	
+	private static double CLIMB_SPEED = 0.5;
 	
 	private IRobotParts parts;
 	
@@ -162,6 +165,7 @@ public class RobotLogic implements IRobotLogic {
 		IJoystick joystick = this.parts.getJoystick();
 		IDrive drive = this.parts.getMecanumDrive();
 		IMotor liftMotor = this.parts.getLiftMotor();
+		IMotor climbMotor = this.parts.getClimbMotor();
 		ITimer timer = this.parts.getTimer();
 		IPneumatics pneumatics = this.parts.getPneumatics();
 		
@@ -169,9 +173,12 @@ public class RobotLogic implements IRobotLogic {
 		double x = joystick.getRawAxis(IJoystick.Axis.LEFT_X);
 		double y = joystick.getRawAxis(IJoystick.Axis.LEFT_Y);
 		double z = joystick.getRawAxis(IJoystick.Axis.RIGHT_X);
-		boolean lift = joystick.getButton(IJoystick.Button.A);
-		boolean closeClaw = joystick.getButton(IJoystick.Button.B);
-		boolean climb = joystick.getButton(IJoystick.Button.X);
+		boolean liftUp = joystick.getPOVDirection() == POV.UP;
+		boolean liftDown = joystick.getPOVDirection() == POV.DOWN;
+		boolean openClaw = joystick.getButton(IJoystick.Button.A);
+		boolean extendClimb = joystick.getButton(IJoystick.Button.B);
+		boolean extendGrabber = joystick.getButton(IJoystick.Button.RT);
+		boolean retractGrabber = joystick.getButton(IJoystick.Button.LT);
 		
 		// Drive
 		drive.driveCartesian(y, x, z);
@@ -179,8 +186,17 @@ public class RobotLogic implements IRobotLogic {
 		// Operate lift TODO - Calculate required speed of lift motor based on position of lift!
 		// liftMotor.set(speed);
 		
-		// Operate pneumatic claws
-		pneumatics.setSolenoidState(closeClaw);
+		// Operate climber
+		if (extendClimb) {
+			climbMotor.set(CLIMB_SPEED);
+		} else {
+			climbMotor.set(0.0);
+		}
+		
+		// Operate grabber
+		
+		// Operate claws
+		pneumatics.setSolenoidState(openClaw);
 		
 	}
 
