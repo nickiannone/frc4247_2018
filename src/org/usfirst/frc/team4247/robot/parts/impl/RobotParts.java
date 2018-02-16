@@ -1,8 +1,10 @@
 package org.usfirst.frc.team4247.robot.parts.impl;
 
+import org.usfirst.frc.team4247.robot.parts.IAccelerometer;
 import org.usfirst.frc.team4247.robot.parts.ICamera;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IDriverStation;
+import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
@@ -24,6 +26,8 @@ public class RobotParts implements IRobotParts {
 	private IDrive mecanumDrive;
 	private IPneumatics pneumatics;
 	private ICamera camera;
+	private IAccelerometer accelerometer;
+	private IGyro gyro;
 	
 	// Initialize the core robot parts (called in robotInit())
 	public RobotParts() {
@@ -64,7 +68,9 @@ public class RobotParts implements IRobotParts {
 		// TODO Figure out ports!
 		this.pneumatics = new Pneumatics(10, 1);
 		
-		// TODO - Other Sensors?
+		// Accelerometer and Gyro
+		this.accelerometer = new Accelerometer();
+		this.gyro = new Gyro(0);
 		
 		// Camera
 		this.camera = new Camera();
@@ -108,5 +114,15 @@ public class RobotParts implements IRobotParts {
 	@Override
 	public ITimer getTimer() {
 		return timer;
+	}
+
+	@Override
+	public IAccelerometer getAccelerometer() {
+		return accelerometer;
+	}
+
+	@Override
+	public IGyro getGyro() {
+		return gyro;
 	}
 }

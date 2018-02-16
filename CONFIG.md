@@ -17,9 +17,13 @@ CAN Bus IDs:
 7. Pneumatics Control Module: 10
 8. Power Distribution Panel: 11
 
-Robot Ports:
+Analog Input Ports:
 
+- Analog Input 0: Gyro Rate
 
+SPI Ports:
+
+- SPI Onboard CS0: ADXL345 Accelerometer (4G range)
 
 Joystick Inputs
 -------------------------------------------

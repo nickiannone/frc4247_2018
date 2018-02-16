@@ -21,6 +21,8 @@ public class Driver {
 	
 	private IRobotParts robotParts;
 	private FieldMap fieldMap;
+	
+	private boolean enteringTask = true;
 
 	public Driver(IRobotParts robotParts, FieldMap fieldMap) {
 		this.robotParts = robotParts;
@@ -29,6 +31,7 @@ public class Driver {
 
 	public void setTasks(List<Task> tasks) {
 		this.currentTasks = tasks;
+		this.enteringTask = true;
 	}
 
 	public AutoState getAutoState(int frameCounter) {
@@ -48,8 +51,12 @@ public class Driver {
 	}
 
 	public void executeTasks() {
-		// TODO Auto-generated method stub
-		
+		Task currentTask = this.currentTasks.get(0);
+		if (enteringTask) {
+			currentTask.enter(this.robotParts);
+			enteringTask = false;
+		}
+		currentTask.process(this.robotParts);
 	}
 
 }

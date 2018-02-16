@@ -1,8 +1,10 @@
 package org.usfirst.frc.team4247.robot.parts.mock;
 
+import org.usfirst.frc.team4247.robot.parts.IAccelerometer;
 import org.usfirst.frc.team4247.robot.parts.ICamera;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IDriverStation;
+import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
@@ -19,6 +21,8 @@ public class MockRobotParts implements IRobotParts {
 	private IJoystick joystick;
 	private ICamera camera;
 	private ITimer timer;
+	private IAccelerometer accelerometer;
+	private IGyro gyro;
 
 	public MockRobotParts() {
 		// TODO Populate this with mock objects!
@@ -94,5 +98,23 @@ public class MockRobotParts implements IRobotParts {
 	
 	public void setTimer(ITimer timer) {
 		this.timer = timer;
+	}
+
+	@Override
+	public IAccelerometer getAccelerometer() {
+		return accelerometer;
+	}
+	
+	public void setAccelerometer(IAccelerometer accel) {
+		this.accelerometer = accel;
+	}
+
+	@Override
+	public IGyro getGyro() {
+		return gyro;
+	}
+	
+	public void setGyro(IGyro gyro) {
+		this.gyro = gyro;
 	}
 }

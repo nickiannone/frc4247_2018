@@ -5,6 +5,8 @@ public interface IRobotParts {
 	IDrive getMecanumDrive();
 	IMotor getLiftMotor(); // Controls the lift
 	IMotor getClimbMotor(); // Extends and retracts the climber
+	IAccelerometer getAccelerometer();
+	IGyro getGyro();
 	IPneumatics getPneumatics();
 	IJoystick getJoystick();
 	ICamera getCamera();
