@@ -9,6 +9,7 @@ import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
+import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
 import org.usfirst.frc.team4247.robot.parts.ITimer;
 
 public class MockRobotParts implements IRobotParts {
@@ -23,6 +24,7 @@ public class MockRobotParts implements IRobotParts {
 	private ITimer timer;
 	private IAccelerometer accelerometer;
 	private IGyro gyro;
+	private ISmartDashboard smartDashboard;
 
 	public MockRobotParts() {
 		// TODO Populate this with mock objects!
@@ -116,5 +118,14 @@ public class MockRobotParts implements IRobotParts {
 	
 	public void setGyro(IGyro gyro) {
 		this.gyro = gyro;
+	}
+	
+	@Override
+	public ISmartDashboard getSmartDashboard() {
+		return smartDashboard;
+	}
+	
+	public void setSmartDashboard(ISmartDashboard sdb) {
+		this.smartDashboard = sdb;
 	}
 }

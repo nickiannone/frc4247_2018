@@ -17,6 +17,7 @@ public class Camera implements ICamera {
 	public void init() {
 		// TODO If this is already configured, discard the previous config and reconnect?
 		axisCamera = CameraServer.getInstance().addAxisCamera("10.42.47.11"); // TODO Make the team number configurable?
+		CameraServer.getInstance().startAutomaticCapture(axisCamera);
 	}
 
 	@Override

@@ -23,7 +23,11 @@ Analog Input Ports:
 
 SPI Ports:
 
-- SPI Onboard CS0: ADXL345 Accelerometer (4G range)
+- SPI Onboard CS0: ADXL345 Accelerometer (4G range) (not functional!)
+
+Camera:
+
+- Axis Camera (10.42.47.11 or axis-camera)
 
 Joystick Inputs
 -------------------------------------------
@@ -39,3 +43,13 @@ Axes:
 - Open Claw: A
 - Extend Grabber: RT
 - Retract Grabber: LT
+
+TODO
+-------------------------------------------
+
+- Get climber programmed
+- Get lift/grabber programmed
+- Reverse drive controls (swap around motor names?)
+- Fix camera connection
+- Configure pneumatics
+- Troubleshoot connector for accelerometer

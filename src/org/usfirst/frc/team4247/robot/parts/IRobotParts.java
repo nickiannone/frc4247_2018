@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4247.robot.parts;
 
+import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
+
 public interface IRobotParts {
 	// Get base components of the robot
 	IDrive getMecanumDrive();
@@ -12,4 +14,5 @@ public interface IRobotParts {
 	ICamera getCamera();
 	ITimer getTimer();
 	IDriverStation getDriverStation();
+	ISmartDashboard getSmartDashboard();
 }

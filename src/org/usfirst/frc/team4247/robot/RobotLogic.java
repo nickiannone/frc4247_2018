@@ -9,12 +9,15 @@ import org.usfirst.frc.team4247.robot.autonomous.Navigator;
 import org.usfirst.frc.team4247.robot.autonomous.State;
 import org.usfirst.frc.team4247.robot.autonomous.Task;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
+import org.usfirst.frc.team4247.robot.parts.ICamera;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
+import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IJoystick.POV;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
+import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
 import org.usfirst.frc.team4247.robot.parts.ITimer;
 import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
@@ -38,41 +41,37 @@ public class RobotLogic implements IRobotLogic {
 		this.parts = parts;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#robotInit()
-	 */
 	@Override
 	public void robotInit() {
+		ISmartDashboard dashboard = this.parts.getSmartDashboard();
+		dashboard.setAutoSelectorOptions(new String[] {
+			"Left",
+			"Center",
+			"Right"
+		});
 		
+		ICamera camera = this.parts.getCamera();
+		camera.init();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#robotPeriodic()
-	 */
 	@Override
 	public void robotPeriodic() {
-		// Compressor?
+		// Report gyro/accel position?
+		IGyro gyro = this.parts.getGyro();
+		ISmartDashboard dashboard = this.parts.getSmartDashboard();
+		dashboard.setNumber("Gyro", gyro.getAngle());
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#disabledInit()
-	 */
 	@Override
 	public void disabledInit() {
 		// Disable the bot
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#disabledPeriodic()
-	 */
 	@Override
 	public void disabledPeriodic() {
 		// Do something cool with lights and stuff, I dunno
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#autonomousInit()
-	 */
 	@Override
 	public void autonomousInit() {
 		// Move into START state
@@ -86,8 +85,21 @@ public class RobotLogic implements IRobotLogic {
 		// Get the GSC from the field, and reinitialize the FieldMap
 		String gsc = this.parts.getDriverStation().getGameSpecificMessage();
 		
-		// TODO Use a switch, analog input, or NetworkTables or something to figure out what side we're on!
-		StartPosition position = StartPosition.LEFT;
+		ISmartDashboard dashboard = this.parts.getSmartDashboard();
+		String autoMode = dashboard.getAutoSelectorOption();
+		StartPosition position;
+		switch (autoMode) {
+		case "Left":
+			position = StartPosition.LEFT;
+			break;
+		case "Center":
+			position = StartPosition.CENTER;
+			break;
+		case "Right":
+		default:
+			position = StartPosition.RIGHT;
+			break;
+		}
 		
 		this.fieldMap = new FieldMap(gsc, position);
 		
@@ -96,9 +108,6 @@ public class RobotLogic implements IRobotLogic {
 		this.driver = new Driver(this.parts, this.fieldMap);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#autonomousPeriodic()
-	 */
 	@Override
 	public void autonomousPeriodic() {
 		this.frameCounter++;
@@ -140,9 +149,6 @@ public class RobotLogic implements IRobotLogic {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#teleopInit()
-	 */
 	@Override
 	public void teleopInit() {
 		// Let the user take control; reset stuff operating during Auto to sane values.
@@ -157,9 +163,6 @@ public class RobotLogic implements IRobotLogic {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.usfirst.frc.team4247.robot.IRobot#teleopPeriodic()
-	 */
 	@Override
 	public void teleopPeriodic() {
 		IJoystick joystick = this.parts.getJoystick();

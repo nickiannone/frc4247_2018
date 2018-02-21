@@ -9,6 +9,7 @@ import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
+import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
 import org.usfirst.frc.team4247.robot.parts.ITimer;
 
 // TODO Move these out into implementation classes!
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 public class RobotParts implements IRobotParts {
 	
 	private IDriverStation driverStation;
+	private ISmartDashboard smartDashboard;
 	private IJoystick joystick;
 	private ITimer timer;
 	
@@ -34,6 +36,9 @@ public class RobotParts implements IRobotParts {
 		
 		// Driver Station
 		this.driverStation = new DriverStation();
+		
+		// Dashboard (for auto stuff, etc.)
+		this.smartDashboard = new SmartDashboard();
 		
 		// Joystick
 		this.joystick = new Joystick(0);
@@ -124,5 +129,10 @@ public class RobotParts implements IRobotParts {
 	@Override
 	public IGyro getGyro() {
 		return gyro;
+	}
+
+	@Override
+	public ISmartDashboard getSmartDashboard() {
+		return smartDashboard;
 	}
 }
