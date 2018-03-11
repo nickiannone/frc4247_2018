@@ -7,6 +7,7 @@ import org.usfirst.frc.team4247.robot.parts.IDriverStation;
 import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
+import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
 import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
@@ -25,6 +26,8 @@ public class MockRobotParts implements IRobotParts {
 	private IAccelerometer accelerometer;
 	private IGyro gyro;
 	private ISmartDashboard smartDashboard;
+	private IPairedSolenoid claw;
+	private IPairedSolenoid grabber;
 
 	public MockRobotParts() {
 		// TODO Populate this with mock objects!
@@ -127,5 +130,23 @@ public class MockRobotParts implements IRobotParts {
 	
 	public void setSmartDashboard(ISmartDashboard sdb) {
 		this.smartDashboard = sdb;
+	}
+	
+	@Override
+	public IPairedSolenoid getClaw() {
+		return claw;
+	}
+	
+	public void setClaw(IPairedSolenoid claw) {
+		this.claw = claw;
+	}
+	
+	@Override
+	public IPairedSolenoid getGrabber() {
+		return grabber;
+	}
+	
+	public void setGrabber(IPairedSolenoid grabber) {
+		this.grabber = grabber;
 	}
 }

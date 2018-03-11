@@ -14,7 +14,9 @@ import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IJoystick.POV;
+import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid.Position;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
+import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
 import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
@@ -24,6 +26,8 @@ import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 public class RobotLogic implements IRobotLogic {
 	
 	private static double CLIMB_SPEED = 0.5;
+	private static double LIFT_UP_SPEED = 0.8;
+	private static double LIFT_DOWN_SPEED = -0.6;
 	
 	private IRobotParts parts;
 	
@@ -171,6 +175,8 @@ public class RobotLogic implements IRobotLogic {
 		IMotor climbMotor = this.parts.getClimbMotor();
 		ITimer timer = this.parts.getTimer();
 		IPneumatics pneumatics = this.parts.getPneumatics();
+		IPairedSolenoid claw = this.parts.getClaw();
+		IPairedSolenoid grabber = this.parts.getGrabber();
 		
 		// Get joystick input
 		double x = joystick.getRawAxis(IJoystick.Axis.LEFT_X);
@@ -187,19 +193,36 @@ public class RobotLogic implements IRobotLogic {
 		drive.driveCartesian(y, x, z);
 		
 		// Operate lift TODO - Calculate required speed of lift motor based on position of lift!
-		// liftMotor.set(speed);
+		if (liftUp) {
+			liftMotor.set(LIFT_UP_SPEED);
+		} else if (liftDown) {
+			liftMotor.set(LIFT_DOWN_SPEED);
+		} else {
+			liftMotor.set(0.0);
+		}
 		
-		// Operate climber
+		// Operate climber TODO Verify!
 		if (extendClimb) {
 			climbMotor.set(CLIMB_SPEED);
 		} else {
 			climbMotor.set(0.0);
 		}
 		
-		// Operate grabber
+		// Operate grabber TODO Verify!
+		if (extendGrabber) {
+			grabber.setPosition(Position.ENGAGED_1);
+		} else if (retractGrabber) {
+			grabber.setPosition(Position.ENGAGED_2);
+		} else {
+			grabber.setPosition(Position.IDLE);
+		}
 		
-		// Operate claws
-		pneumatics.setSolenoidState(openClaw);
+		// Operate claw TODO Verify!
+		if (openClaw) {
+			claw.setPosition(Position.ENGAGED_1);
+		} else {
+			claw.setPosition(Position.ENGAGED_2);
+		}
 		
 	}
 

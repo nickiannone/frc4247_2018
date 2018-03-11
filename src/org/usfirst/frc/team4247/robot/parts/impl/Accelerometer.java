@@ -1,9 +1,8 @@
 package org.usfirst.frc.team4247.robot.parts.impl;
 
 import org.usfirst.frc.team4247.robot.parts.IAccelerometer;
-
-import edu.wpi.first.wpilibj.ADXL345_SPI;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.ADXL345_I2C;
+import edu.wpi.first.wpilibj.I2C;
 
 public class Accelerometer implements IAccelerometer {
 	
@@ -12,10 +11,8 @@ public class Accelerometer implements IAccelerometer {
 	public Accelerometer() {
 		// TODO Use I2C or SPI?
 		// TODO Configure range (2G, 4G, 8G, or 16G)?
-		this.accelerometer = new ADXL345_SPI(SPI.Port.kOnboardCS0, 
+		this.accelerometer = new ADXL345_I2C(I2C.Port.kOnboard,
 				edu.wpi.first.wpilibj.interfaces.Accelerometer.Range.k4G);
-		
-		// TODO Configure SPI-specific fields?
 	}
 
 	@Override

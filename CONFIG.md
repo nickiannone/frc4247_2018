@@ -21,13 +21,26 @@ Analog Input Ports:
 
 - Analog Input 0: Gyro Rate
 
-SPI Ports:
+Digital Input/Output Ports:
 
-- SPI Onboard CS0: ADXL345 Accelerometer (4G range) (not functional!)
+- 0: Unused
+- 1: (Output) Open Claw
+- 2: (Output) Close Claw
+- 3: (Output) Extend Grabber
+- 4: (Output) Retract Grabber
+- 5: Unused
+- 6: Unused
+- 7: Unused
+- 8: (Input) Lift Encoder Channel A
+- 9: (Input) Lift Encoder Channel B
+
+SPI/I2C Ports:
+
+- I2C Onboard: ADXL345 Accelerometer (4G range) (needs testing!)
 
 Camera:
 
-- Axis Camera (10.42.47.11 or axis-camera)
+- Axis Camera (10.42.47.11 or axis-camera) (needs reconfiguration!)
 
 Joystick Inputs
 -------------------------------------------

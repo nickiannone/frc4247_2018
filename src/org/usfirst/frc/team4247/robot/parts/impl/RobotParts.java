@@ -7,6 +7,7 @@ import org.usfirst.frc.team4247.robot.parts.IDriverStation;
 import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
+import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid;
 import org.usfirst.frc.team4247.robot.parts.IPneumatics;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
 import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
@@ -30,6 +31,8 @@ public class RobotParts implements IRobotParts {
 	private ICamera camera;
 	private IAccelerometer accelerometer;
 	private IGyro gyro;
+	private IPairedSolenoid claw;
+	private IPairedSolenoid grabber;
 	
 	// Initialize the core robot parts (called in robotInit())
 	public RobotParts() {
@@ -72,6 +75,8 @@ public class RobotParts implements IRobotParts {
 		// Pneumatics
 		// TODO Figure out ports!
 		this.pneumatics = new Pneumatics(10, 1);
+		this.grabber = new PairedSolenoid(3, 4);
+		this.claw = new PairedSolenoid(1, 2);
 		
 		// Accelerometer and Gyro
 		this.accelerometer = new Accelerometer();
@@ -134,5 +139,15 @@ public class RobotParts implements IRobotParts {
 	@Override
 	public ISmartDashboard getSmartDashboard() {
 		return smartDashboard;
+	}
+
+	@Override
+	public IPairedSolenoid getGrabber() {
+		return grabber;
+	}
+
+	@Override
+	public IPairedSolenoid getClaw() {
+		return claw;
 	}
 }

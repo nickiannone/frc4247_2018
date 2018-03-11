@@ -15,4 +15,7 @@ public interface IRobotParts {
 	ITimer getTimer();
 	IDriverStation getDriverStation();
 	ISmartDashboard getSmartDashboard();
+	
+	IPairedSolenoid getGrabber();
+	IPairedSolenoid getClaw();
 }
