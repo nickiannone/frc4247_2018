@@ -31,6 +31,10 @@ public class MyMecanumDrive extends MecanumDrive {
 			m_reported = true;
 		}
 		
+		// NOTE Invert the X- and Y- speed because we swapped the motors on accident
+		ySpeed = -ySpeed;
+		xSpeed = -xSpeed;
+		
 		ySpeed = limit(ySpeed);
 		ySpeed = applyDeadband(ySpeed, m_deadband);
 		
