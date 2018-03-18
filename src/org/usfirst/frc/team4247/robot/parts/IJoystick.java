@@ -18,18 +18,18 @@ public interface IJoystick {
 	}
 	
 	public enum Button {
-		A(1),
-		B(2),
-		X(0),
-		Y(3),
-		LB(4),
-		RB(5),
-		LT(6),
-		RT(7),
-		BACK(8),
-		START(9),
-		LSTICK(10),
-		RSTICK(11);
+		X(1),
+		A(2),
+		B(3),
+		Y(4),
+		LB(5),
+		RB(6),
+		LT(7),
+		RT(8),
+		BACK(9),
+		START(10),
+		LSTICK(11),
+		RSTICK(12);
 		
 		public int id;
 		

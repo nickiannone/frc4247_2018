@@ -3,16 +3,18 @@ package org.usfirst.frc.team4247.robot.parts.impl;
 import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Solenoid;
 
 public class PairedSolenoid implements IPairedSolenoid {
 	
-	private DigitalOutput solenoid1;
-	private DigitalOutput solenoid2;
+	private Solenoid solenoid1;
+	private Solenoid solenoid2;
+	
 	private Position pos;
 	
-	public PairedSolenoid(int port1, int port2) {
-		this.solenoid1 = new DigitalOutput(port1);
-		this.solenoid2 = new DigitalOutput(port2);
+	public PairedSolenoid(int pcmCANId, int port1, int port2) {
+		this.solenoid1 = new Solenoid(pcmCANId, port1);
+		this.solenoid2 = new Solenoid(pcmCANId, port2);
 		this.reset();
 	}
 

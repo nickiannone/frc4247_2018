@@ -74,9 +74,9 @@ public class RobotParts implements IRobotParts {
 		
 		// Pneumatics
 		// TODO Figure out ports!
-		this.pneumatics = new Pneumatics(10, 1);
-		this.grabber = new PairedSolenoid(3, 4);
-		this.claw = new PairedSolenoid(1, 2);
+		this.pneumatics = new Pneumatics(10, 0);
+		this.grabber = new PairedSolenoid(10, 5, 6);
+		this.claw = new PairedSolenoid(10, 1, 2);
 		
 		// Accelerometer and Gyro
 		this.accelerometer = new Accelerometer();

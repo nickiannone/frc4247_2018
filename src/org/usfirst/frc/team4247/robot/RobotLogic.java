@@ -25,9 +25,16 @@ import org.usfirst.frc.team4247.robot.vision.VisionProcessor;
 
 public class RobotLogic implements IRobotLogic {
 	
-	private static double CLIMB_SPEED = 0.5;
+	private static double CLIMB_SPEED = 1.0;
 	private static double LIFT_UP_SPEED = 0.8;
 	private static double LIFT_DOWN_SPEED = -0.6;
+	
+	private static boolean AUTO_CLIMB_EXTEND = false;
+	
+	// TODO Figure out timings for raising the climber!
+	private static double NEAR_END_OF_MATCH = 100.0; // seconds since match start
+	private static double TIME_TO_RAISE_CLIMBER = 28.0; // seconds to raise climber
+	private static double TIME_TO_CLIMB_A_FOOT = 15.0;
 	
 	private IRobotParts parts;
 	
@@ -185,7 +192,8 @@ public class RobotLogic implements IRobotLogic {
 		boolean liftUp = joystick.getPOVDirection() == POV.UP;
 		boolean liftDown = joystick.getPOVDirection() == POV.DOWN;
 		boolean openClaw = joystick.getButton(IJoystick.Button.A);
-		boolean extendClimb = joystick.getButton(IJoystick.Button.B);
+		boolean extendClimb = joystick.getButton(IJoystick.Button.Y);
+		boolean retractClimb = joystick.getButton(IJoystick.Button.B);
 		boolean extendGrabber = joystick.getButton(IJoystick.Button.RT);
 		boolean retractGrabber = joystick.getButton(IJoystick.Button.LT);
 		
@@ -201,14 +209,7 @@ public class RobotLogic implements IRobotLogic {
 			liftMotor.set(0.0);
 		}
 		
-		// Operate climber TODO Verify!
-		if (extendClimb) {
-			climbMotor.set(CLIMB_SPEED);
-		} else {
-			climbMotor.set(0.0);
-		}
-		
-		// Operate grabber TODO Verify!
+		// Operate grabber
 		if (extendGrabber) {
 			grabber.setPosition(Position.ENGAGED_1);
 		} else if (retractGrabber) {
@@ -217,13 +218,37 @@ public class RobotLogic implements IRobotLogic {
 			grabber.setPosition(Position.IDLE);
 		}
 		
-		// Operate claw TODO Verify!
+		// Operate claw
 		if (openClaw) {
 			claw.setPosition(Position.ENGAGED_1);
 		} else {
 			claw.setPosition(Position.ENGAGED_2);
 		}
 		
+		// If we're close enough to the end of the match, raise the claw
+		if (AUTO_CLIMB_EXTEND) {
+			// Automatic extension
+			if (timer.hasPeriodPassed(NEAR_END_OF_MATCH)) {
+				if (!timer.hasPeriodPassed(NEAR_END_OF_MATCH + TIME_TO_RAISE_CLIMBER)) {
+					climbMotor.set(CLIMB_SPEED);
+				} else if (extendClimb) {
+					climbMotor.set(CLIMB_SPEED);
+				} else if (retractClimb) {
+					climbMotor.set(-CLIMB_SPEED);
+				} else {
+					climbMotor.set(0.0);
+				}
+			}
+		} else {
+			// Manual control
+			if (extendClimb) {
+				climbMotor.set(CLIMB_SPEED);
+			} else if (retractClimb) {
+				climbMotor.set(-CLIMB_SPEED);
+			} else {
+				climbMotor.set(0.0);
+			}
+		}
 	}
 
 }
