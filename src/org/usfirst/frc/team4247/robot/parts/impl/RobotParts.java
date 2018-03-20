@@ -4,6 +4,7 @@ import org.usfirst.frc.team4247.robot.parts.IAccelerometer;
 import org.usfirst.frc.team4247.robot.parts.ICamera;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IDriverStation;
+import org.usfirst.frc.team4247.robot.parts.IEncoder;
 import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
@@ -25,6 +26,7 @@ public class RobotParts implements IRobotParts {
 	private ITimer timer;
 	
 	private IMotor liftMotor;
+	private IEncoder liftEncoder;
 	private IMotor climbMotor;
 	private IDrive mecanumDrive;
 	private IPneumatics pneumatics;
@@ -53,6 +55,9 @@ public class RobotParts implements IRobotParts {
 		WPI_TalonSRX lift = new WPI_TalonSRX(5);
 		// TODO Invert if needed!
 		this.liftMotor = new Motor(lift);
+		
+		// Lift encoder
+		this.liftEncoder = new Encoder(8, 9, false);
 		
 		// Climb motor - Do we need another Talon for this?
 		WPI_TalonSRX climb = new WPI_TalonSRX(6);
@@ -149,5 +154,10 @@ public class RobotParts implements IRobotParts {
 	@Override
 	public IPairedSolenoid getClaw() {
 		return claw;
+	}
+
+	@Override
+	public IEncoder getLiftEncoder() {
+		return liftEncoder;
 	}
 }

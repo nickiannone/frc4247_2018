@@ -4,6 +4,7 @@ import org.usfirst.frc.team4247.robot.parts.IAccelerometer;
 import org.usfirst.frc.team4247.robot.parts.ICamera;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IDriverStation;
+import org.usfirst.frc.team4247.robot.parts.IEncoder;
 import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
 import org.usfirst.frc.team4247.robot.parts.IMotor;
@@ -18,6 +19,7 @@ public class MockRobotParts implements IRobotParts {
 	private IDriverStation driverStation;
 	private IDrive mecanumDrive;
 	private IMotor liftMotor;
+	private IEncoder liftEncoder;
 	private IMotor climbMotor;
 	private IPneumatics pneumatics;
 	private IJoystick joystick;
@@ -148,5 +150,14 @@ public class MockRobotParts implements IRobotParts {
 	
 	public void setGrabber(IPairedSolenoid grabber) {
 		this.grabber = grabber;
+	}
+	
+	@Override
+	public IEncoder getLiftEncoder() {
+		return liftEncoder;
+	}
+	
+	public void setLiftEncoder(IEncoder enc) {
+		this.liftEncoder = enc;
 	}
 }
