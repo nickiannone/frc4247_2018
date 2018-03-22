@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4247.robot.parts.impl;
 
+import org.usfirst.frc.team4247.robot.RobotUtils;
+
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.drive.Vector2d;
@@ -9,6 +11,11 @@ import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class MyMecanumDrive extends MecanumDrive {
+	
+	private double frontLeftSpeed = 0.0;
+	private double frontRightSpeed = 0.0;
+	private double rearLeftSpeed = 0.0;
+	private double rearRightSpeed = 0.0;
 	
 	public MyMecanumDrive(SpeedController frontLeftMotor, SpeedController rearLeftMotor,
             SpeedController frontRightMotor, SpeedController rearRightMotor) {
@@ -22,6 +29,8 @@ public class MyMecanumDrive extends MecanumDrive {
 	private boolean m_reported = false;
 
 	private SpeedController m_frontLeftMotor, m_frontRightMotor, m_rearLeftMotor, m_rearRightMotor;
+	
+	private static final double MAX_DELTA = 0.2;
 	
 	@Override
 	public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
@@ -51,10 +60,21 @@ public class MyMecanumDrive extends MecanumDrive {
 
 		normalize(wheelSpeeds);
 		
-		m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
-		m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput);
-		m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
-		m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
+		double newFrontLeftSpeed = wheelSpeeds[MotorType.kFrontLeft.value];
+		double newFrontRightSpeed = wheelSpeeds[MotorType.kFrontRight.value];
+		double newRearLeftSpeed = wheelSpeeds[MotorType.kRearLeft.value];
+		double newRearRightSpeed = wheelSpeeds[MotorType.kRearRight.value];
+		
+		// Debounce the speeds
+		frontLeftSpeed = RobotUtils.debounce(newFrontLeftSpeed, frontLeftSpeed, MAX_DELTA);
+		frontRightSpeed = RobotUtils.debounce(newFrontRightSpeed, frontRightSpeed, MAX_DELTA);
+		rearLeftSpeed = RobotUtils.debounce(newRearLeftSpeed, rearLeftSpeed, MAX_DELTA);
+		rearRightSpeed = RobotUtils.debounce(newRearRightSpeed, rearRightSpeed, MAX_DELTA);
+		
+		m_frontLeftMotor.set(frontLeftSpeed * m_maxOutput);
+		m_frontRightMotor.set(frontRightSpeed * m_maxOutput);
+		m_rearLeftMotor.set(rearLeftSpeed * m_maxOutput);
+		m_rearRightMotor.set(rearRightSpeed * m_maxOutput);
 		
 		m_safetyHelper.feed();
 	}

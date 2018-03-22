@@ -93,6 +93,8 @@ public class RobotLogic implements IRobotLogic {
 	
 	@Override
 	public void autonomousInit() {
+		return;/*
+		
 		// Move into START state
 		this.state = State.START;
 		this.enteringState = true;
@@ -125,10 +127,14 @@ public class RobotLogic implements IRobotLogic {
 		// Set up the Navigator and the Driver
 		this.navigator = new Navigator(this.fieldMap);
 		this.driver = new Driver(this.parts, this.fieldMap);
+		*/
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
+		return;
+		
+/*		
 		this.frameCounter++;
 		if (this.enteringState) {
 			List<Task> tasks = this.navigator.generateInitialTasks(this.state);
@@ -166,6 +172,7 @@ public class RobotLogic implements IRobotLogic {
 			// Otherwise, just let the driver do what they do.
 			this.driver.executeTasks();
 		}
+		*/
 	}
 	
 	@Override

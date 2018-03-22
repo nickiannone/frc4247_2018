@@ -48,4 +48,15 @@ public class RobotUtils {
 			return value;
 		}
 	}
+
+	public static double debounce(double newValue, double oldValue, double maxDelta) {
+		if (Math.abs(newValue - oldValue) > maxDelta) {
+			if (newValue > oldValue) {
+				return oldValue + maxDelta;
+			} else {
+				return oldValue - maxDelta;
+			}
+		}
+		return newValue;
+	}
 }
