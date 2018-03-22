@@ -53,6 +53,8 @@ public class RobotLogic implements IRobotLogic {
 	private Driver driver;
 	private VisionProcessor vision;
 	
+	private StartPosition startPosition;
+	
 	public RobotLogic(IRobotParts parts) {
 		this.parts = parts;
 	}
@@ -93,34 +95,28 @@ public class RobotLogic implements IRobotLogic {
 	
 	@Override
 	public void autonomousInit() {
-		return;/*
+		this.parts.getTimer().start();
+		String gsc = this.parts.getDriverStation().getGameSpecificMessage();
+		ISmartDashboard dashboard = this.parts.getSmartDashboard();
+		String autoMode = dashboard.getAutoSelectorOption();
+		switch (autoMode) {
+		case "Left":
+			startPosition = StartPosition.LEFT;
+			break;
+		case "Center":
+			startPosition = StartPosition.CENTER;
+			break;
+		case "Right":
+		default:
+			startPosition = StartPosition.RIGHT;
+			break;
+		}
+				
+		/*
 		
 		// Move into START state
 		this.state = State.START;
 		this.enteringState = true;
-		
-		// Start the timer
-		this.parts.getTimer().start();
-		this.frameCounter = 0;
-		
-		// Get the GSC from the field, and reinitialize the FieldMap
-		String gsc = this.parts.getDriverStation().getGameSpecificMessage();
-		
-		ISmartDashboard dashboard = this.parts.getSmartDashboard();
-		String autoMode = dashboard.getAutoSelectorOption();
-		StartPosition position;
-		switch (autoMode) {
-		case "Left":
-			position = StartPosition.LEFT;
-			break;
-		case "Center":
-			position = StartPosition.CENTER;
-			break;
-		case "Right":
-		default:
-			position = StartPosition.RIGHT;
-			break;
-		}
 		
 		this.fieldMap = new FieldMap(gsc, position);
 		
@@ -132,7 +128,35 @@ public class RobotLogic implements IRobotLogic {
 	
 	@Override
 	public void autonomousPeriodic() {
-		return;
+
+		switch (startPosition) {
+		case LEFT:
+			
+		case CENTER:
+			
+			
+		case RIGHT:
+			
+			
+			
+		}
+		
+		// If we have it set, delay 3 or 5 seconds
+		
+		// Left path: 
+		//	- Drive forward 0.5s
+		//	- Drive left 0.5s
+		//  - Drive forward 1.5s
+		
+		// Center path:
+		//  - Drive forward 0.5s
+		//  - Drive left 2.5s
+		//  - Drive forward 1.5s
+		
+		// Right path:
+		//  - Drive forward 0.5s
+		//  - Drive right 0.5s
+		//  - Drive forward 1.5s
 		
 /*		
 		this.frameCounter++;
