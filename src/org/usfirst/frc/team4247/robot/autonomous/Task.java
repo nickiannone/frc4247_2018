@@ -1,8 +1,14 @@
 package org.usfirst.frc.team4247.robot.autonomous;
 
+import org.usfirst.frc.team4247.robot.parts.IAccelerometer;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IRobotParts;
 import org.usfirst.frc.team4247.robot.parts.ITimer;
+import org.usfirst.frc.team4247.robot.parts.IEncoder;
+import org.usfirst.frc.team4247.robot.parts.IGyro;
+import org.usfirst.frc.team4247.robot.parts.IMotor;
+import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid;
+import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid.Position;
 
 /**
  * The Task class represents a single operation to be performed
@@ -32,6 +38,7 @@ public class Task {
 	
 	// Drive solver
 	private IDriveSolver driveSolver;
+	private ILiftSolver liftSolver;
 
 	public Task(TaskType type, double value) {
 		this.type = type;
@@ -56,43 +63,72 @@ public class Task {
 		
 		switch (type) {
 		case DRIVE:
-			driveSolver = new ConstantDriveSolver();
+			driveSolver = new RampingDriveSolver();
+			liftSolver = new NoLiftSolver();
 			break;
 		case STRAFE:
 			driveSolver = new RampingDriveSolver();
+			liftSolver = new NoLiftSolver();
 			break;
 		case ROTATE:
 			driveSolver = new RampingGyroDriveSolver(robotParts.getGyro());
+			liftSolver = new NoLiftSolver();
 			break;
 		case GRAB:
-			
+			driveSolver = new NoDriveSolver();
+			liftSolver = new LiftGrabSolver();
 			break;
 		case RELEASE:
-			
+			driveSolver = new NoDriveSolver();
+			liftSolver = new LiftReleaseSolver();
 			break;
 		}
 	}
 	
-	public void process(IRobotParts robotParts) {
+	public boolean process(IRobotParts robotParts) {
 		ITimer timer = robotParts.getTimer();
 		double timeSinceStart = timer.get() - this.startTime;
 		
+		IDrive drive = robotParts.getMecanumDrive();
+		IMotor liftMotor = robotParts.getLiftMotor();
+		IPairedSolenoid claw = robotParts.getClaw();
+		IPairedSolenoid grabber = robotParts.getGrabber();
+		IEncoder liftEncoder = robotParts.getLiftEncoder();
+		IGyro gyro = robotParts.getGyro();
+		IAccelerometer accel = robotParts.getAccelerometer();
+
+		IDriveSolver.Outputs driveOutputs = driveSolver.updateDrive(timeSinceStart, accel.getX(), accel.getY(), gyro.getAngle(), robotParts.getSmartDashboard());
+		ILiftSolver.Outputs outputs = liftSolver.updateLiftSolver(timeSinceStart, liftEncoder.getDistance());
+		
 		switch (type) {
 		case DRIVE:
-			
-			break;
 		case STRAFE:
-			
-			break;
 		case ROTATE:
-			
-			break;
+			drive.driveCartesian(driveOutputs.y, driveOutputs.x, driveOutputs.zRot);
+			return driveOutputs.done;
 		case GRAB:
-			
-			break;
 		case RELEASE:
+			drive.driveCartesian(outputs.y, outputs.x, outputs.zRot);
 			
-			break;
+			liftMotor.set(outputs.liftMotorOutput);
+			
+			if (outputs.openClaw) {
+				claw.setPosition(Position.ENGAGED_1);
+			} else {
+				claw.setPosition(Position.ENGAGED_2);
+			}
+			
+			if (outputs.extendGrabber) {
+				grabber.setPosition(Position.ENGAGED_1);
+			} else if (outputs.retractGrabber) {
+				grabber.setPosition(Position.ENGAGED_2);
+			} else {
+				grabber.setPosition(Position.IDLE);
+			}
+
+			return outputs.done;
+		default:
+			return true;
 		}
 	}
 }

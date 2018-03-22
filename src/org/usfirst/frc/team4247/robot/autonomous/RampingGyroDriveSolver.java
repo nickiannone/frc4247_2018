@@ -1,14 +1,18 @@
 package org.usfirst.frc.team4247.robot.autonomous;
 
 import org.usfirst.frc.team4247.robot.RobotUtils;
-import org.usfirst.frc.team4247.robot.parts.IDrive;
 import org.usfirst.frc.team4247.robot.parts.IGyro;
+import org.usfirst.frc.team4247.robot.parts.ISmartDashboard;
 
 /**
  * A rotation-only version of the Drive solver that uses the gyro for rotation.
  */
 public class RampingGyroDriveSolver implements IDriveSolver {
 	
+	// Full rotation speed (degrees per unit joystick input)
+	// TODO Measure this from robot!
+	private static final double ROTATE_FULL_SPEED = 10.0;
+
 	private IGyro gyro;
 	private double startingAngle = 0.0;
 	private double goalAngle = 0.0;
@@ -19,34 +23,38 @@ public class RampingGyroDriveSolver implements IDriveSolver {
 	}
 	
 	@Override
-	public void initDrive(IDrive drive, double distance, DriveAxis axis) {
+	public void initDrive(double goal, DriveDirection direction) {
 		startingAngle = gyro.getAngle();
-		goalAngle = distance;
+		goalAngle = goal;
 		
 		// Figure out whether we turn clockwise or counterclockwise
-		double shortestOffset = RobotUtils.deltaAngle(startingAngle, distance);
+		double shortestOffset = RobotUtils.deltaAngle(startingAngle, goal);
 		clockwise = (shortestOffset > 0.0);
 	}
 
 	@Override
-	public double updateDrive(IDrive drive, double dTime) {
-		double currentAngle = gyro.getAngle();
+	public Outputs updateDrive(double dTime, double accelX, double accelY, double gyroAngle, ISmartDashboard dashboard) {
+		Outputs o = new Outputs();
+		
+		double currentAngle = gyroAngle;
 		
 		// Figure out how much we can turn in this frame.
 		double remainingAngle = RobotUtils.deltaAngle(currentAngle, goalAngle);
 		clockwise = (remainingAngle > 0.0);
-		double desiredAbsDeltaAngle = Math.min(Math.abs(remainingAngle), IDriveSolver.ROTATE_FULL_SPEED);
+		double desiredAbsDeltaAngle = Math.min(Math.abs(remainingAngle), ROTATE_FULL_SPEED);
 		double desiredDeltaAngle = (clockwise) ? desiredAbsDeltaAngle : -desiredAbsDeltaAngle;
 		
 		// Convert back from degrees per second to joystick input
-		// TODO Apply PID ramping before this conversion?
-		double rotationSpeed = desiredDeltaAngle / IDriveSolver.ROTATE_FULL_SPEED;
+		// TODO Apply PID ramping before this conversion!
+		double rotationSpeed = desiredDeltaAngle / ROTATE_FULL_SPEED;
 		
-		// Drive us in the correct direction.
-		drive.driveCartesian(0, 0, rotationSpeed);
+		o.zRot = rotationSpeed;
 		
-		// Return the current angle.
-		return currentAngle;
+		if (Math.abs(remainingAngle) < 1.0) {
+			o.done = true;
+		}
+		
+		return o;
 	}
 
 }

@@ -30,4 +30,22 @@ public class RobotUtils {
 		// Clamp the delta 
 		return clampAngle(delta);
 	}
+	
+	public static double sinDegs(double degs) {
+		return Math.sin(degs * Math.PI / 180.0);
+	}
+	
+	public static double cosDegs(double degs) {
+		return Math.cos(degs * Math.PI / 180.0);
+	}
+
+	public static double clamp(double value, double min, double max) {
+		if (value > max) {
+			return max;
+		} else if (value < min) {
+			return min;
+		} else {
+			return value;
+		}
+	}
 }

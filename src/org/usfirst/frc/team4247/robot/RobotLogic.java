@@ -215,6 +215,7 @@ public class RobotLogic implements IRobotLogic {
 		dashboard.setNumber("accelerometerX", accelerometer.getX());
 		dashboard.setNumber("accelerometerY", accelerometer.getY());
 		dashboard.setNumber("accelerometerZ", accelerometer.getZ());
+		dashboard.setNumber("gyroRate", gyro.getRate());
 		
 		// Drive
 		drive.driveCartesian(y, x, z);
