@@ -27,8 +27,8 @@ import org.usfirst.frc.team4247.robot.parts.IPairedSolenoid.Position;
  */
 public class Task {
 	
-	private TaskType type;
-	private double value;
+	public TaskType type;
+	public double value;
 	
 	// The time at which this task was entered.
 	private double startTime;

@@ -144,7 +144,6 @@ public class FieldMap {
 	}
 	
 	// =====================================================
-	
 	private List<Target> targets = new ArrayList<>();
 	private List<Cube> cubes = new ArrayList<>();
 	private List<Obstacle> obstacles = new ArrayList<>();
@@ -269,5 +268,15 @@ public class FieldMap {
 		double xDiff = b.x - a.x;
 		double yDiff = b.y - a.y;
 		return (xDiff * xDiff) + (yDiff * yDiff);
+	}
+
+	public boolean isNavigable(Position position) {
+		// TODO Check through list of obstacles and see if this is inside something!
+		return false;
+	}
+
+	public double calculateHeuristic(Position start, Position end) {
+		// TODO Calculate the inverse average of distances from all obstacles
+		return 0;
 	}
 }

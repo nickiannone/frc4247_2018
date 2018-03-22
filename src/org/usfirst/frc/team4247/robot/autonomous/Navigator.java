@@ -19,6 +19,9 @@ import org.usfirst.frc.team4247.robot.parts.IRobotParts;
  */
 public class Navigator {
 	
+	// TODO Calculate unit distance!
+	private static final double ONE_UNIT_DISTANCE = 6.5;
+	
 	private FieldMap fieldMap;
 
 	public Navigator(FieldMap fieldMap) {
@@ -85,10 +88,26 @@ public class Navigator {
 	
 	private List<Task> generatePathBetween(Position p, Region r) {
 		// TODO Implement pathfinding algorithm!!!
-		return new LinkedList<Task>();
+		List<Task> taskList = new LinkedList<Task>();
 		
+		Pathfinder pathfinder = new Pathfinder(fieldMap);
+		List<Pathfinder.Step> pathSteps = pathfinder.solve(p, r);
+		Pathfinder.Step previousStep = null;
+		Task currentTask = null;
+		for (Pathfinder.Step step : pathSteps) {
+			if (currentTask != null && previousStep != null && previousStep.direction == step.direction) {
+				// Add onto the same task
+				currentTask.value += (step.direction == Pathfinder.Direction.RIGHT || step.direction == Pathfinder.Direction.FORWARD) ? ONE_UNIT_DISTANCE : -ONE_UNIT_DISTANCE;
+			} else {
+				TaskType t = (step.direction == Pathfinder.Direction.LEFT || step.direction == Pathfinder.Direction.RIGHT) ? TaskType.STRAFE : TaskType.DRIVE;
+				double distance = (step.direction == Pathfinder.Direction.RIGHT || step.direction == Pathfinder.Direction.FORWARD) ? ONE_UNIT_DISTANCE : -ONE_UNIT_DISTANCE;
+				currentTask = new Task(t, distance);
+				taskList.add(currentTask);
+			}
+			previousStep = step;
+		}
 		
-		
+		return taskList;
 	}
 	
 	private boolean checkCollision(double x, double y) {

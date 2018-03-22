@@ -25,4 +25,8 @@ public class Region {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	public boolean contains(Position position) {
+		return (position.x >= xMin && position.x <= xMax && position.y >= yMin && position.y <= yMax);
+	}
 }
