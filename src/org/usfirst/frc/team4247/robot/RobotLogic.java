@@ -55,6 +55,10 @@ public class RobotLogic implements IRobotLogic {
 	
 	private StartPosition startPosition;
 	
+	private double firstForwardTime;
+	private double firstSidewaysTime;
+	private double secondForwardTime;
+	
 	public RobotLogic(IRobotParts parts) {
 		this.parts = parts;
 	}
@@ -99,19 +103,44 @@ public class RobotLogic implements IRobotLogic {
 		String gsc = this.parts.getDriverStation().getGameSpecificMessage();
 		ISmartDashboard dashboard = this.parts.getSmartDashboard();
 		String autoMode = dashboard.getAutoSelectorOption();
+		// Left path: 
+		//	- Drive forward 0.5s
+		//	- Drive left 0.5s
+		//  - Drive forward 1.5s
+		
+		// Center path:
+		//  - Drive forward 0.5s
+		//  - Drive left 2.5s
+		//  - Drive forward 1.5s
+		
+		// Right path:
+		//  - Drive forward 0.5s
+		//  - Drive right 0.5s
+		//  - Drive forward 1.5s
+
+		
 		switch (autoMode) {
 		case "Left":
 			startPosition = StartPosition.LEFT;
+			firstForwardTime = 0.5;
+			firstSidewaysTime = firstForwardTime + 0.5;
+			secondForwardTime = firstSidewaysTime + 1.5;
 			break;
 		case "Center":
 			startPosition = StartPosition.CENTER;
+			firstForwardTime = 0.5;
+			firstSidewaysTime = firstForwardTime + 2.5;
+			secondForwardTime = firstSidewaysTime + 1.5;
 			break;
 		case "Right":
 		default:
 			startPosition = StartPosition.RIGHT;
+			firstForwardTime = 0.5;
+			firstSidewaysTime = firstForwardTime + 0.5;
+			secondForwardTime = firstSidewaysTime + 1.5;
 			break;
 		}
-				
+		
 		/*
 		
 		// Move into START state
@@ -128,36 +157,23 @@ public class RobotLogic implements IRobotLogic {
 	
 	@Override
 	public void autonomousPeriodic() {
-
-		switch (startPosition) {
-		case LEFT:
-			
-		case CENTER:
-			
-			
-		case RIGHT:
-			
-			
-			
+		// Grab a match delay value from the dashboard
+		double optionalMatchDelay = parts.getSmartDashboard().getNumber("D/B Slider 0", 0.0);
+		double matchTime = parts.getTimer().get();
+		IDrive mecanumDrive = parts.getMecanumDrive();
+		
+		if (matchTime < optionalMatchDelay) {
+			mecanumDrive.stopDrive();
+		} else if (matchTime < optionalMatchDelay + firstForwardTime) {
+			mecanumDrive.driveCartesian(0.25, 0.0, 0.0);
+		} else if (matchTime < optionalMatchDelay + firstSidewaysTime) {
+			mecanumDrive.driveCartesian(0.0, 0.25 * ((startPosition == StartPosition.RIGHT) ? 1.0 : -1.0), 0.0);
+		} else if (matchTime < optionalMatchDelay + secondForwardTime) {
+			mecanumDrive.driveCartesian(0.25, 0.0, 0.0);
+		} else {
+			mecanumDrive.stopDrive();
 		}
-		
-		// If we have it set, delay 3 or 5 seconds
-		
-		// Left path: 
-		//	- Drive forward 0.5s
-		//	- Drive left 0.5s
-		//  - Drive forward 1.5s
-		
-		// Center path:
-		//  - Drive forward 0.5s
-		//  - Drive left 2.5s
-		//  - Drive forward 1.5s
-		
-		// Right path:
-		//  - Drive forward 0.5s
-		//  - Drive right 0.5s
-		//  - Drive forward 1.5s
-		
+				
 /*		
 		this.frameCounter++;
 		if (this.enteringState) {
