@@ -1,18 +1,17 @@
 package org.usfirst.frc.team4247.robot;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import org.usfirst.frc.team4247.robot.autonomous.AutoState;
+import org.usfirst.frc.team4247.robot.autonomous.Command;
 import org.usfirst.frc.team4247.robot.autonomous.Driver;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap;
 import org.usfirst.frc.team4247.robot.autonomous.Navigator;
 import org.usfirst.frc.team4247.robot.autonomous.State;
-import org.usfirst.frc.team4247.robot.autonomous.Task;
 import org.usfirst.frc.team4247.robot.autonomous.FieldMap.StartPosition;
 import org.usfirst.frc.team4247.robot.parts.IAccelerometer;
 import org.usfirst.frc.team4247.robot.parts.ICamera;
 import org.usfirst.frc.team4247.robot.parts.IDrive;
-import org.usfirst.frc.team4247.robot.parts.IDriverStation;
 import org.usfirst.frc.team4247.robot.parts.IEncoder;
 import org.usfirst.frc.team4247.robot.parts.IGyro;
 import org.usfirst.frc.team4247.robot.parts.IJoystick;
@@ -34,11 +33,11 @@ public class RobotLogic implements IRobotLogic {
 	
 	private static double MAX_LIFT_DISTANCE = 3800.0;
 	
-	private static boolean AUTO_CLIMB_EXTEND = false;
+	private static boolean AUTO_CLIMB_EXTEND = true;
 	
 	// TODO Figure out timings for raising the climber!
-	private static double NEAR_END_OF_MATCH = 100.0; // seconds since match start
-	private static double TIME_TO_RAISE_CLIMBER = 28.0; // seconds to raise climber
+	private static double NEAR_END_OF_MATCH = 55.0; // seconds since match start
+	private static double TIME_TO_RAISE_CLIMBER = 26.0; // seconds to raise climber
 	private static double TIME_TO_CLIMB_A_FOOT = 15.0;
 	
 	private IRobotParts parts;
@@ -55,6 +54,9 @@ public class RobotLogic implements IRobotLogic {
 	
 	private StartPosition startPosition;
 	
+	private List<Command> autoCommands;
+	
+	private double startTime;
 	private double firstForwardTime;
 	private double firstSidewaysTime;
 	private double secondForwardTime;
@@ -77,6 +79,16 @@ public class RobotLogic implements IRobotLogic {
 		
 		IEncoder liftEncoder = this.parts.getLiftEncoder();
 		liftEncoder.reset();
+		
+		ITimer timer = this.parts.getTimer();
+		timer.reset();
+		timer.start();
+		
+		// Enable pneumatics if not already enabled
+		IPneumatics pneumatics = this.parts.getPneumatics();
+		if (!pneumatics.isClosedLoopControlEnabled()) {
+			pneumatics.setClosedLoopControl(true);
+		}
 	}
 	
 	@Override
@@ -99,47 +111,33 @@ public class RobotLogic implements IRobotLogic {
 	
 	@Override
 	public void autonomousInit() {
-		this.parts.getTimer().start();
-		String gsc = this.parts.getDriverStation().getGameSpecificMessage();
+		this.parts.getTimer().reset();
+		// String gsc = this.parts.getDriverStation().getGameSpecificMessage();
 		ISmartDashboard dashboard = this.parts.getSmartDashboard();
 		String autoMode = dashboard.getAutoSelectorOption();
-		// Left path: 
-		//	- Drive forward 0.5s
-		//	- Drive left 0.5s
-		//  - Drive forward 1.5s
-		
-		// Center path:
-		//  - Drive forward 0.5s
-		//  - Drive left 2.5s
-		//  - Drive forward 1.5s
-		
-		// Right path:
-		//  - Drive forward 0.5s
-		//  - Drive right 0.5s
-		//  - Drive forward 1.5s
 
+		autoCommands = new LinkedList<Command>();
+		double optionalDelayTime = parts.getSmartDashboard().getNumber("D/B Slider 0", 0.0);
+		autoCommands.add(new Command(optionalDelayTime, 0.0, 0.0, 0.0));
 		
 		switch (autoMode) {
-		case "Left":
-			startPosition = StartPosition.LEFT;
-			firstForwardTime = 0.5;
-			firstSidewaysTime = firstForwardTime + 0.5;
-			secondForwardTime = firstSidewaysTime + 1.5;
-			break;
 		case "Center":
-			startPosition = StartPosition.CENTER;
-			firstForwardTime = 0.5;
-			firstSidewaysTime = firstForwardTime + 2.5;
-			secondForwardTime = firstSidewaysTime + 1.5;
+			autoCommands.add(new Command(0.25, 0.0, -0.5, 0.0));
+			autoCommands.add(new Command(0.75, 0.0, 0.0, 0.5));
+			autoCommands.add(new Command(0.5, 0.0, -0.5, 0.0));
+			autoCommands.add(new Command(0.75, 0.0, 0.0, -0.5));
+			autoCommands.add(new Command(2.0, 0.0, -0.5, 0.0));
+			autoCommands.add(new Command(0.1, 0.0, 0.0, 0.0));
 			break;
+		case "Left":
 		case "Right":
 		default:
-			startPosition = StartPosition.RIGHT;
-			firstForwardTime = 0.5;
-			firstSidewaysTime = firstForwardTime + 0.5;
-			secondForwardTime = firstSidewaysTime + 1.5;
+			autoCommands.add(new Command(2.0, 0.0, -0.5, 0.0));
+			autoCommands.add(new Command(0.1, 0.0, 0.0, 0.0));
 			break;
 		}
+		
+		this.startTime = this.parts.getTimer().get();
 		
 		/*
 		
@@ -158,18 +156,17 @@ public class RobotLogic implements IRobotLogic {
 	@Override
 	public void autonomousPeriodic() {
 		// Grab a match delay value from the dashboard
-		double optionalMatchDelay = parts.getSmartDashboard().getNumber("D/B Slider 0", 0.0);
 		double matchTime = parts.getTimer().get();
 		IDrive mecanumDrive = parts.getMecanumDrive();
 		
-		if (matchTime < optionalMatchDelay) {
-			mecanumDrive.stopDrive();
-		} else if (matchTime < optionalMatchDelay + firstForwardTime) {
-			mecanumDrive.driveCartesian(0.25, 0.0, 0.0);
-		} else if (matchTime < optionalMatchDelay + firstSidewaysTime) {
-			mecanumDrive.driveCartesian(0.0, 0.25 * ((startPosition == StartPosition.RIGHT) ? 1.0 : -1.0), 0.0);
-		} else if (matchTime < optionalMatchDelay + secondForwardTime) {
-			mecanumDrive.driveCartesian(0.25, 0.0, 0.0);
+		if (!this.autoCommands.isEmpty()) {
+			Command c = this.autoCommands.get(0);
+			mecanumDrive.driveCartesian(c.y, c.x, c.zRot);
+			if (matchTime >= startTime + c.duration) {
+				// Pop the command and reset the start time.
+				startTime = this.parts.getTimer().get();
+				this.autoCommands.remove(0);
+			}
 		} else {
 			mecanumDrive.stopDrive();
 		}
@@ -221,12 +218,6 @@ public class RobotLogic implements IRobotLogic {
 		
 		// Stop the drive
 		this.parts.getMecanumDrive().stopDrive();
-		
-		// Enable pneumatics if not already enabled
-		IPneumatics pneumatics = this.parts.getPneumatics();
-		if (!pneumatics.isClosedLoopControlEnabled()) {
-			pneumatics.setClosedLoopControl(true);
-		}
 	}
 	
 	@Override
@@ -294,17 +285,19 @@ public class RobotLogic implements IRobotLogic {
 		
 		// If we're close enough to the end of the match, raise the claw
 		if (AUTO_CLIMB_EXTEND) {
+			dashboard.setNumber("climbStart", startTime + NEAR_END_OF_MATCH);
+			dashboard.setNumber("climbEnd", startTime + NEAR_END_OF_MATCH + TIME_TO_RAISE_CLIMBER);
+			dashboard.setNumber("timer", timer.get());
+			
 			// Automatic extension
-			if (timer.hasPeriodPassed(NEAR_END_OF_MATCH)) {
-				if (!timer.hasPeriodPassed(NEAR_END_OF_MATCH + TIME_TO_RAISE_CLIMBER)) {
-					climbMotor.set(CLIMB_SPEED);
-				} else if (extendClimb) {
-					climbMotor.set(CLIMB_SPEED);
-				} else if (retractClimb) {
-					climbMotor.set(-CLIMB_SPEED);
-				} else {
-					climbMotor.set(0.0);
-				}
+			if (extendClimb) {
+				climbMotor.set(CLIMB_SPEED);
+			} else if (retractClimb) {
+				climbMotor.set(-CLIMB_SPEED);
+			} else if (timer.get() > startTime + NEAR_END_OF_MATCH && timer.get() < startTime + NEAR_END_OF_MATCH + TIME_TO_RAISE_CLIMBER) {
+				climbMotor.set(CLIMB_SPEED);
+			} else {
+				climbMotor.set(0.0);
 			}
 		} else {
 			// Manual control
@@ -315,6 +308,11 @@ public class RobotLogic implements IRobotLogic {
 			} else {
 				climbMotor.set(0.0);
 			}
+		}
+		
+		// Disable the compressor toward the end of the match
+		if (timer.get() > startTime + 120.0) {
+			pneumatics.setClosedLoopControl(false);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4247.robot.parts.impl;
 
+
 import org.usfirst.frc.team4247.robot.RobotUtils;
 
 import edu.wpi.first.wpilibj.SpeedController;
@@ -8,7 +9,6 @@ import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class MyMecanumDrive extends MecanumDrive {
 	
@@ -30,7 +30,7 @@ public class MyMecanumDrive extends MecanumDrive {
 
 	private SpeedController m_frontLeftMotor, m_frontRightMotor, m_rearLeftMotor, m_rearRightMotor;
 	
-	private static final double MAX_DELTA = 0.2;
+	private static final double MAX_DELTA = 0.05;
 	
 	@Override
 	public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
